@@ -5,3 +5,22 @@
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 }
+
+.scroll-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scroll-thin::-webkit-scrollbar-button {
+  display: none; /* hides arrows */
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
+  border-radius: 0px; /* sharp edge */
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+

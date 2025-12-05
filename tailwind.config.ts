@@ -21,21 +21,17 @@ const config: Config = {
 
         // Accent for success / “check” UX
         accent: {
-          50: "#e6fff4",
-          100: "#c1ffe2",
-          200: "#8bffd0",
-          300: "#52f2b0",
-          400: "#20d48b",
-          500: "#00b86e",
-          600: "#00925a",
-          700: "#007047",
-          800: "#004d33",
-          850: "#151515",
-          900: "#101010",
-          950: "#080808"
+          50: "#f4e9ff", 
+          200: "#d7b6ff", 
+          400: "#a78bfa", 
+          500: "#8b5cf6", 
+          700: "#5b21b6", 
+          850: "#1a0b29", 
+          900: "#14071f", 
+          950: "#0d0414", 
         },
 
-        // Neutral surfaces (dark UI like you started)
+        // Neutral surfaces (dark UI)
         surface: {
           50: "#f5f5f5",
           100: "#e5e5e5",

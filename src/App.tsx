@@ -22,13 +22,14 @@ function App() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-linear-to-b from-surface-700 to-surface-800 text-gray-300">
+    <div className="h-screen w-screen overflow-hidden bg-linear-to-b from-surface-700 to-surface-800 text-gray-300 relative">
+
       {/* Top navbar */}
       <Navbar />
 
       {/* Side navbar */}
       <div className="flex h-[calc(100vh-3rem)] w-full">
-        <aside className="w-72 overflow-hidden">
+        <aside className="w-72 overflow-auto">
           <Sidebar />
         </aside>
 
@@ -39,7 +40,7 @@ function App() {
           </div>
         </main>
 
-        <aside className="w-12 overflow-hidden">
+        <aside className="w-12 m-0 overflow-hidden">
           <SidebarRight />
         </aside>
       </div>
