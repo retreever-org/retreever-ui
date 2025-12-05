@@ -5,6 +5,7 @@ import Sidebar from "./layouts/Sidebar";
 import SidebarRight from "./layouts/SidebarRight";
 import { useIsInitializing } from "./stores/doc-store";
 import { AppInitializer } from "./services/app-init";
+import { FloatingDock } from "./layouts/FloatingDock";
 
 function App() {
   const isInitializing = useIsInitializing();
@@ -44,6 +45,9 @@ function App() {
           <SidebarRight />
         </aside>
       </div>
+      <FloatingDock>
+        <div>Hello</div>
+      </FloatingDock>
     </div>
   );
 }
