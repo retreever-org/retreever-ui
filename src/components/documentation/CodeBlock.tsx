@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -21,6 +21,10 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, example }) => {
     : "No Schema Example Documented";
 
   const [view, setView] = useState<"json" | "json_ex">("json");
+
+  useEffect(() => {
+    setView("json")
+  },[code])
 
   const handleCopy = () => {
     navigator.clipboard.writeText(json);

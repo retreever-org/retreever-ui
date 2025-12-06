@@ -5,6 +5,7 @@ import SidebarRight from "./layouts/SidebarRight";
 import { useIsInitializing } from "./stores/doc-store";
 import { useAppInitializer } from "./hooks/useAppInitializer";
 import { useApiHealthMonitor } from "./hooks/useApiHealthMonitor";
+import { FloatingDock } from "./layouts/FloatingDock";
 
 function App() {
   const isInitializing = useIsInitializing();
@@ -42,6 +43,9 @@ function App() {
           <SidebarRight />
         </aside>
       </div>
+
+      {/* Floating Dock */}
+      <FloatingDock/>
     </div>
   );
 }
