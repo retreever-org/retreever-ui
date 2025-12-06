@@ -44,11 +44,11 @@ export const Navbar: React.FC = () => {
 
           <a
             target="_blank"
-            href="https://retreever.dev"
-            title="Retreever"
+            href="https://retreever.dev/docs/spring-boot/tutorials/annotations"
+            title="Documentation Guide"
             className="rounded-md bg-primary-500 px-3 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-primary-600 transition-all duration-200"
           >
-            Visit Site
+            Guide
           </a>
 
           <a

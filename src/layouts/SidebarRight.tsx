@@ -1,5 +1,5 @@
 import React from "react"
-import { DocumentIcon, HeadersIcon, VariableIcon } from "../svgs/svgs"
+import { DocumentIcon, HeadersIcon, ShortcutIcon, VariableIcon } from "../svgs/svgs"
 import { useDockStore } from "../stores/dock-store"
 
 const SidebarRight: React.FC = () => {
@@ -14,6 +14,7 @@ const SidebarRight: React.FC = () => {
       {/* Other icons (no action yet) */}
       <Button icon={<HeadersIcon />} />
       <Button icon={<VariableIcon />} />
+      <Button icon={<ShortcutIcon />} />
     </div>
   )
 }

@@ -17,7 +17,7 @@ interface DockState {
 }
 
 export const useDockStore = create<DockState>((set) => ({
-  open: true,
+  open: false,
   x: 120,
   y: 60,
   width: 420,

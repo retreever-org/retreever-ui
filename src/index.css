@@ -8,6 +8,7 @@
 
 .scroll-thin::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
 .scroll-thin::-webkit-scrollbar-button {
@@ -23,4 +24,6 @@
   background: transparent;
 }
 
-
+.scroll-bar-round::-webkit-scrollbar-thumb {
+  border-radius: 10px; /* sharp edge */
+}
