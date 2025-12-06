@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useViewingEndpoint } from "../stores/viewing-doc-store";
 import { CodeBlock } from "../components/documentation/CodeBlock";
 import { CheckIcon, ErrorIcon, InfoIcon, SparkIcon } from "../svgs/svgs";
+import type { FieldMetadata } from "../types/response.types";
+import Metadata from "../components/documentation/Metadata";
 
 const DocumentDisplay: React.FC = () => {
   const endpoint = useViewingEndpoint();
@@ -30,11 +32,11 @@ const DocumentDisplay: React.FC = () => {
 
         {/* Method & URI / Path */}
 
-        <h2 className="py-1 px-2 text-lg font-bold tracking-wide font-mono text-surface-100 break-all bg-black/10 rounded-md border border-surface-500/50">
-          <span className="pr-2 border-r border-surface-500">
+        <h2 className="flex flex-wrap py-1 px-2 text-lg font-bold tracking-wide font-mono text-surface-100 bg-black/10 rounded-md border border-surface-500/50">
+          <span className="pr-2">
             {endpoint.method}
           </span>{" "}
-          <span className="py-1 text-[0.9rem] tracking-normal font-normal text-success/60 rounded-md ">
+          <span className="py-1 pl-2 border-l border-surface-500 text-[0.9rem] tracking-normal font-normal text-success/60 break-all">
             {endpoint.path}
           </span>
         </h2>
@@ -52,29 +54,32 @@ const DocumentDisplay: React.FC = () => {
       {/* REQUEST SECTION */}
 
       {request && (
-        <section className="space-y-4">
-          <h3 className="flex items-center gap-1.5  px-2 text-md font-medium text-surface-200">
+        <SwitchableViewWithTitle
+          title="Request Model"
+          icon={
             <span className="text-primary-400">
               <InfoIcon />
             </span>
-            <span>Request Model</span>
-          </h3>
-          <CodeBlock code={request?.model} example={request?.example_model} />
-        </section>
+          }
+          model={request?.model}
+          example={request?.example_model}
+          metadata={request?.metadata}
+        />
       )}
 
       {/* RESPONSE SECTION */}
 
       {response && (
-        <section className="space-y-4">
-          <h3 className="flex items-center gap-1.5 px-2 text-md font-medium text-surface-200">
+        <SwitchableViewWithTitle
+          title="Response Model"
+          icon={
             <span className="text-success/80">
               <CheckIcon />
             </span>
-            <span>Response Model</span>
-          </h3>
-          <CodeBlock code={response?.model} example={response?.example_model} />
-        </section>
+          }
+          model={response?.model}
+          example={response?.example_model}
+        />
       )}
 
       {/* ERROR RESPONSES SECTION */}
@@ -105,8 +110,8 @@ const DocumentDisplay: React.FC = () => {
               )}
 
               <div className="mt-3" />
-              <CodeBlock
-                code={err.response?.model}
+              <SwitchableView
+                model={err.response?.model}
                 example={err.response?.example_model}
               />
             </div>
@@ -118,3 +123,60 @@ const DocumentDisplay: React.FC = () => {
 };
 
 export default DocumentDisplay;
+
+// --------------------- Switchable View of Models with header title ----------------------
+
+interface ModelDisplayProps {
+  title: string;
+  icon: React.ReactNode;
+  model: string | undefined;
+  example: string | undefined;
+  metadata?: Record<string, FieldMetadata> | undefined;
+}
+
+function SwitchableViewWithTitle({
+  title,
+  icon,
+  model,
+  example,
+  metadata,
+}: ModelDisplayProps) {
+  return (
+    <section className="space-y-4">
+      <div>
+        <h3 className="flex items-center gap-1.5 px-2 text-md font-medium text-surface-200">
+          {icon}
+          <span>{title}</span>
+        </h3>
+      </div>
+      <SwitchableView model={model} example={example} metadata={metadata} />
+    </section>
+  );
+}
+
+// --------------------------- Switchable View of Models ---------------------------
+
+interface SwitchableViewProp {
+  model: string | undefined;
+  example: string | undefined;
+  metadata?: Record<string, FieldMetadata> | undefined;
+}
+
+function SwitchableView({ model, example, metadata }: SwitchableViewProp) {
+  const [viewMetadata, setViewMetadata] = useState<boolean>();
+
+  return (
+    <>
+      {viewMetadata && metadata ? (
+        <Metadata data={metadata} closeMetadata={setViewMetadata} />
+      ) : (
+        <CodeBlock
+          code={model}
+          example={example}
+          swapCodeBlock={setViewMetadata}
+          swappable={metadata !== undefined}
+        />
+      )}
+    </>
+  );
+}

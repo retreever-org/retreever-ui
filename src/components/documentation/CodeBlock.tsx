@@ -12,9 +12,16 @@ const codeBlockStyle = {
 interface CodeBlockProps {
   code?: string;
   example?: string;
+  swappable?: boolean;
+  swapCodeBlock: (value: boolean) => void;
 }
 
-export const CodeBlock: React.FC<CodeBlockProps> = ({ code, example }) => {
+export const CodeBlock: React.FC<CodeBlockProps> = ({
+  code,
+  example,
+  swappable,
+  swapCodeBlock,
+}) => {
   const json = code ? JSON.stringify(code, null, 2) : "No Schema Documented";
   const json_ex = example
     ? JSON.stringify(example, null, 2)
@@ -23,8 +30,8 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, example }) => {
   const [view, setView] = useState<"json" | "json_ex">("json");
 
   useEffect(() => {
-    setView("json")
-  },[code])
+    setView("json");
+  }, [code]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(json);
@@ -40,18 +47,33 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, example }) => {
       {/* Header Row */}
       <div className="w-full flex justify-end items-center space-x-2">
         {/* View Switch */}
-        <button
-          onClick={() =>
-            view === "json" ? setView("json_ex") : setView("json")
-          }
-          className="
-            mr-auto transition-opacity 
+        <div className="mr-auto flex items-center gap-2">
+          <button
+            onClick={() =>
+              view === "json" ? setView("json_ex") : setView("json")
+            }
+            className="
+            transition-opacity 
             text-[0.65rem] text-surface-200 px-1.5 py-0.5 rounded-sm border border-surface-500/50 
             hover:bg-surface-600/40
           "
-        >
-          {view === "json" ? "VIEW EXAMPLE" : "VIEW SCHEMA"}
-        </button>
+          >
+            {view === "json" ? "VIEW EXAMPLE" : "VIEW SCHEMA"}
+          </button>
+
+          {swappable && (
+            <button
+              onClick={() => swapCodeBlock(true)}
+              className="
+            transition-opacity 
+            text-[0.65rem] text-surface-200 px-1.5 py-0.5 rounded-sm border border-surface-500/50 
+            hover:bg-surface-600/40
+          "
+            >
+              METADATA
+            </button>
+          )}
+        </div>
 
         {/* COPY BUTTON (only visible on hover) */}
         {canCopy && (
