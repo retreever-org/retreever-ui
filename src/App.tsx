@@ -1,18 +1,15 @@
-import { useEffect } from "react";
 import Canvas from "./layouts/Canvas";
 import { Navbar } from "./layouts/Navbar";
 import Sidebar from "./layouts/Sidebar";
 import SidebarRight from "./layouts/SidebarRight";
 import { useIsInitializing } from "./stores/doc-store";
-import { AppInitializer } from "./services/app-init";
-import { FloatingDock } from "./layouts/FloatingDock";
+import { useAppInitializer } from "./hooks/useAppInitializer";
+import { useApiHealthMonitor } from "./hooks/useApiHealthMonitor";
 
 function App() {
   const isInitializing = useIsInitializing();
-
-  useEffect(() => {
-    AppInitializer.initialize();
-  }, []);
+  useAppInitializer();
+  useApiHealthMonitor();
 
   if (isInitializing) {
     return (
@@ -45,9 +42,6 @@ function App() {
           <SidebarRight />
         </aside>
       </div>
-      <FloatingDock>
-        <div>Hello</div>
-      </FloatingDock>
     </div>
   );
 }
