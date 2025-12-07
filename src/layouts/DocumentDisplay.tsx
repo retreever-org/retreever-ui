@@ -34,9 +34,7 @@ const DocumentDisplay: React.FC = () => {
         {/* Method & URI / Path */}
 
         <h2 className="flex flex-wrap py-1 px-2 text-lg font-bold tracking-wide font-mono text-surface-100 bg-black/10 rounded-md border border-surface-500/50">
-          <span className="pr-2">
-            {endpoint.method}
-          </span>{" "}
+          <span className="pr-2">{endpoint.method}</span>{" "}
           <span className="py-1 pl-2 border-l border-surface-500 text-[0.9rem] tracking-normal font-normal text-success/60 break-all">
             {endpoint.path}
           </span>
@@ -54,7 +52,7 @@ const DocumentDisplay: React.FC = () => {
 
       {/* REQUEST SECTION */}
 
-      <RequestParamView 
+      <RequestParamView
         headers={endpoint?.headers}
         pathVariables={endpoint?.path_variables}
         queryParams={endpoint?.query_params}
@@ -62,7 +60,7 @@ const DocumentDisplay: React.FC = () => {
 
       {request && (
         <SwitchableViewWithTitle
-          title="Request Model"
+          title="Request Body"
           icon={
             <span className="text-primary-400">
               <InfoIcon />
@@ -76,18 +74,25 @@ const DocumentDisplay: React.FC = () => {
 
       {/* RESPONSE SECTION */}
 
-      {response && (
-        <SwitchableViewWithTitle
-          title="Response Model"
-          icon={
-            <span className="text-success/80">
-              <CheckIcon />
-            </span>
-          }
-          model={response?.model}
-          example={response?.example_model}
-        />
-      )}
+      <div className="space-y-2">
+        <h3 className="flex items-center gap-1.5 px-2 text-md font-medium text-surface-200">
+          <span className="text-success/80">
+            <CheckIcon />
+          </span>{" "}
+          <span>Response</span>
+        </h3>
+
+        <p className="text-surface-200 text-sm font-normal font-mono px-3 py-2 mt-4 bg-black/10 border border-surface-500/50 rounded-xl">
+          Status: <span className="text-success/80">{endpoint.status_code} - {endpoint.status}</span>
+        </p>
+
+        {response && (
+          <SwitchableViewWithTitle
+            model={response?.model}
+            example={response?.example_model}
+          />
+        )}
+      </div>
 
       {/* ERROR RESPONSES SECTION */}
 
@@ -134,8 +139,8 @@ export default DocumentDisplay;
 // --------------------- Switchable View of Models with header title ----------------------
 
 interface ModelDisplayProps {
-  title: string;
-  icon: React.ReactNode;
+  title?: string;
+  icon?: React.ReactNode;
   model: string | undefined;
   example: string | undefined;
   metadata?: Record<string, FieldMetadata> | undefined;
