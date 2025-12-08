@@ -15,7 +15,7 @@ function App() {
 
   if (isInitializing) {
     return (
-      <div className="h-screen w-screen bg-surface-800 flex items-center justify-center">
+      <div className="h-screen w-screen bg-surface-800 text-surface-300 flex items-center justify-center">
         <div>Loading Retreever...</div>
       </div>
     );

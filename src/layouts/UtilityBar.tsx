@@ -2,6 +2,8 @@ import React from "react";
 import { DocumentIcon, ShortcutIcon, VariableIcon } from "../svgs/svgs";
 import { useRightPanelStore } from "../stores/right-panel-store";
 import { useDockStore } from "../stores/dock-store";
+import Shortcut from "../components/utility/Shortcut";
+import EnvironmentVars from "../components/utility/Environment";
 
 const UtilityBar: React.FC = () => {
   const { closePanel, openPanel, panelName } = useRightPanelStore();
@@ -22,17 +24,18 @@ const UtilityBar: React.FC = () => {
       id="utility-drawer"
       className="absolute z-20 bg-linear-to-b from-surface-700 to-surface-800 top-0 right-0 h-full w-12 border-l border-surface-500/30 flex flex-col items-center"
     >
+      
       <Button
         icon={<DocumentIcon />}
         onClick={() => (open ? closeDock() : openDock())}
       />
       <Button
         icon={<VariableIcon />}
-        onClick={() => handleClick(<div>Env Vars</div>, "env-btn")}
+        onClick={() => handleClick(<EnvironmentVars />, "env-btn")}
       />
       <Button
         icon={<ShortcutIcon />}
-        onClick={() => handleClick(<div>Shortcuts</div>, "shortcut-btn")}
+        onClick={() => handleClick(<Shortcut />, "shortcut-btn")}
       />
     </div>
   );
