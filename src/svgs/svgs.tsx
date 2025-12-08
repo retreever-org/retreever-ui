@@ -48,7 +48,7 @@ export const DocumentIcon: React.FC = () => {
       viewBox="0 0 24 24"
       strokeWidth={1.2}
       stroke="currentColor"
-      className="size-6 text-surface-300"
+      className="size-5"
     >
       <path
         strokeLinecap="round"
@@ -67,7 +67,7 @@ export const VariableIcon: React.FC = () => {
       viewBox="0 0 24 24"
       stroke-width="1.2"
       stroke="currentColor"
-      className="size-6 text-surface-300"
+      className="size-5"
     >
       <path
         stroke-linecap="round"
@@ -105,7 +105,7 @@ export const ShortcutIcon: React.FC = () => {
       viewBox="0 0 24 24"
       stroke-width="1.2"
       stroke="currentColor"
-      className="size-6 text-surface-300"
+      className="size-5"
     >
       <path
         stroke-linecap="round"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { DocumentIcon, ShortcutIcon, VariableIcon } from "../svgs/svgs";
 import { useRightPanelStore } from "../stores/right-panel-store";
 import { useDockStore } from "../stores/dock-store";
@@ -9,15 +9,45 @@ const UtilityBar: React.FC = () => {
   const { closePanel, openPanel, panelName } = useRightPanelStore();
   const { open, openDock, closeDock } = useDockStore();
 
-  const handleClick = (element: React.ReactNode, newPanelName: string) => {
-    if (panelName === newPanelName) {
-      console.log("closing");
-      closePanel();
-      return;
-    }
-    console.log("opening");
-    openPanel(element, newPanelName);
-  };
+  const handleClick = useCallback(
+    (element: React.ReactNode, newPanelName: string) => {
+      if (panelName === newPanelName) {
+        closePanel();
+        return;
+      }
+      openPanel(element, newPanelName);
+    },
+    [panelName, closePanel, openPanel]
+  );
+
+  // Keyboard shortcuts: run once, use the stable handleClick
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isTextInput =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+      if (isTextInput) return;
+
+      // Ctrl + /
+      if (e.ctrlKey && (e.key === "/" || e.code === "Slash")) {
+        e.preventDefault();
+        handleClick(<Shortcut />, "shortcut-btn");
+        return;
+      }
+
+      // Alt + Shift + E
+      if (e.altKey && e.shiftKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        handleClick(<EnvironmentVars />, "env-btn");
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleClick]);
 
   return (
     <div
@@ -55,14 +85,14 @@ function Button({
     <button
       onClick={onClick}
       className="
-        w-full py-6 border-b border-surface-500/30 
+        w-full border-surface-500/30 
         flex justify-center items-center 
         hover:bg-surface-800 
         transition-all
       "
     >
       {/* Icon wrapper — only this animates */}
-      <span className="transition-transform active:scale-90 active:-translate-y-[0.05px]">
+      <span className="text-surface-300/80 w-full py-4 hover:text-surface-200 flex justify-center items-center  transition-transform active:scale-90 active:-translate-y-[0.05px]">
         {icon}
       </span>
     </button>

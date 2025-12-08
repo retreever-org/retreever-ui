@@ -8,7 +8,7 @@ export function RightDisplayPanel() {
   const [width, setWidth] = useState(360);
   const [visible, setVisible] = useState(isPanelOpen);
 
-  const NAVBAR_HEIGHT = 50; // your navbar height
+  const NAVBAR_HEIGHT = 49; // your navbar height
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -55,7 +55,7 @@ export function RightDisplayPanel() {
   return (
     <div
       ref={panelRef}
-      className="fixed h-[calc(100vh-50px)]" // BELOW navbar
+      className="fixed h-[calc(100vh-49px)]" // BELOW navbar
       style={{
         top: NAVBAR_HEIGHT,
         right: 48, // stays next to UtilityBar
