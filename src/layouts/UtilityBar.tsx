@@ -89,6 +89,7 @@ function Button({
         flex justify-center items-center 
         hover:bg-surface-800 
         transition-all
+        cursor-pointer
       "
     >
       {/* Icon wrapper — only this animates */}

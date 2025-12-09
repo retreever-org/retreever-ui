@@ -34,7 +34,7 @@ export default function EnvironmentPanel() {
 
         <button
           className="px-3 py-1 rounded-md text-sm font-medium text-white
-                     bg-linear-to-br from-primary-400 to-primary-500 hover:opacity-90"
+                     bg-linear-to-br from-primary-400 to-primary-500 hover:opacity-90 cursor-pointer"
         >
           Learn
         </button>
@@ -45,12 +45,12 @@ export default function EnvironmentPanel() {
         Environment Variables are best configured in your backend. You can still
         add and manage them here, but they cannot be shared across your team.
       </p>
-      <p className="text-xs text-primary-300/80 -mt-1.5">
+      <button className="text-xs text-primary-300/80 -mt-1.5 text-left hover:text-primary-300 cursor-pointer">
         Learn about environment variables.
-      </p>
+      </button>
 
       {/* TABLE */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto mt-4">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="text-surface-200">
@@ -72,13 +72,13 @@ export default function EnvironmentPanel() {
               const isServerVar = !row.local; // non-local = server-configured
 
               return (
-                <tr key={index} className="group text-surface-200 hover:bg-black/20">
+                <tr key={index} className="group text-surface-200 hover:bg-surface-500/5">
                   {/* NAME CELL */}
                   <td className="px-4 py-2 border-b border-r border-surface-500/50">
                     <input
                       type="text"
                       value={name}
-                      placeholder="Variable name"
+                      placeholder="Add New Variable"
                       disabled={!row.editable || isServerVar}
                       onChange={(e) =>
                         handleNameChange(row, e.currentTarget.value)
