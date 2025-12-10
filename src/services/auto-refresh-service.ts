@@ -16,7 +16,10 @@ useApiHealthStore.subscribe(async (state) => {
     return;
   }
   lastRefreshRequired = current;
+  refreshAllStale();
+});
 
+export const refreshAllStale = async () => {
   const controller = new AbortController();
 
   const [doc, env] = await Promise.all([
@@ -34,4 +37,4 @@ useApiHealthStore.subscribe(async (state) => {
   } finally {
     useApiHealthStore.getState().setRefreshRequired(false);
   }
-});
+}

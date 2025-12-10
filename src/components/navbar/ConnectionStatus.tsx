@@ -3,9 +3,13 @@ import {
   useIsApiOnline,
 } from "../../stores/api-state-store";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { RepeatIcon } from "../../svgs/svgs";
+import { refreshAllStale } from "../../services/auto-refresh-service";
 
 const ConnectionStatus: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const isOnline = useIsApiOnline();
   const lastHeartbeat = useApiLastHeartbeat();
 
@@ -23,28 +27,74 @@ const ConnectionStatus: React.FC = () => {
     });
   };
 
+  const handleClick = async () => {
+    if (isOnline || isRefreshing) return;
+
+    setIsRefreshing(true);
+
+    // wait for the spin to finish before firing refresh
+    const SPIN_DURATION_MS = 600;
+    setTimeout(async () => {
+      try {
+        await refreshAllStale();
+      } finally {
+        setIsRefreshing(false);
+      }
+    }, SPIN_DURATION_MS);
+  };
+
   return (
     <div className="relative inline-block">
-      <button
-        className="hidden items-center gap-1 rounded-md border border-surface-500/80 hover:border-surface-500 px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 sm:inline-flex"
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-      >
-        <span
-          className={`h-1.5 w-1.5 rounded-full transition-colors duration-200 ${
-            isOnline ? "bg-success" : "bg-danger animate-pulse"
-          }`}
-        />
-        <span
-          className={`${
-            isOnline
-              ? "text-surface-200 hover:text-green-50"
-              : "text-surface-200 hover:text-orange-50"
-          }`}
+      <div className="gap-1.5 flex justify-center items-center">
+        {!isOnline && (
+          <motion.span
+            className="text-surface-400"
+            animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <RepeatIcon />
+          </motion.span>
+        )}
+
+        <motion.button
+          type="button"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          onClick={handleClick}
+          disabled={isOnline || isRefreshing}
+          whileTap={
+            !isOnline && !isRefreshing
+              ? { scale: 0.96 }
+              : undefined
+          }
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className={`
+            hidden sm:inline-flex
+            items-center gap-1
+            rounded-md border px-2.5 py-1.5
+            text-[11px] font-medium
+            border-surface-500/80
+            transition-colors duration-150
+            ${!isOnline && !isRefreshing ? "hover:border-surface-500 cursor-pointer" : "opacity-60 cursor-not-allowed"}
+          `}
         >
-          {statusText}
-        </span>
-      </button>
+          <span
+            className={`
+              h-1.5 w-1.5 rounded-full transition-colors duration-200
+              ${isOnline ? "bg-success" : "bg-danger animate-pulse"}
+            `}
+          />
+          <span
+            className={
+              isOnline
+                ? "text-surface-200"
+                : "text-surface-200"
+            }
+          >
+            {statusText}
+          </span>
+        </motion.button>
+      </div>
 
       {showTooltip && (
         <div
