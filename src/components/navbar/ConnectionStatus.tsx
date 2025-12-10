@@ -60,13 +60,11 @@ const ConnectionStatus: React.FC = () => {
           type="button"
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          onClick={handleClick}
-          disabled={isOnline || isRefreshing}
-          whileTap={
-            !isOnline && !isRefreshing
-              ? { scale: 0.96 }
-              : undefined
-          }
+          onClick={() => {
+            if (!isOnline && !isRefreshing) handleClick();
+          }}
+          // disabled={isOnline || isRefreshing}
+          whileTap={!isOnline && !isRefreshing ? { scale: 0.96 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className={`
             hidden sm:inline-flex
@@ -75,7 +73,8 @@ const ConnectionStatus: React.FC = () => {
             text-[11px] font-medium
             border-surface-500/80
             transition-colors duration-150
-            ${!isOnline && !isRefreshing ? "hover:border-surface-500 cursor-pointer" : "opacity-60 cursor-not-allowed"}
+            hover:border-surface-500 
+            ${!isOnline && !isRefreshing && "cursor-pointer"}
           `}
         >
           <span
@@ -84,13 +83,7 @@ const ConnectionStatus: React.FC = () => {
               ${isOnline ? "bg-success" : "bg-danger animate-pulse"}
             `}
           />
-          <span
-            className={
-              isOnline
-                ? "text-surface-200"
-                : "text-surface-200"
-            }
-          >
+          <span className={isOnline ? "text-surface-200" : "text-surface-200"}>
             {statusText}
           </span>
         </motion.button>
