@@ -1,10 +1,13 @@
 import { useEnvVarsStore, isVariableEmpty } from "../../stores/env-vars-store";
 import type { ResolvedVariable } from "../../types/env.types";
 import "../../storage/env-sync";
-import { DeleteIcon } from "../../svgs/svgs";
+import { DeleteIcon, WarningIcon } from "../../svgs/svgs";
+import { useApiHealthStore } from "../../stores/api-state-store";
+import { div } from "framer-motion/client";
 
 export default function EnvironmentPanel() {
   const { vars, updateValue, updateKey, deleteVar } = useEnvVarsStore();
+  const { isOnline } = useApiHealthStore();
 
   const commitRow = async (row: ResolvedVariable) => {
     const name = (row.name ?? "").trim();
@@ -26,6 +29,11 @@ export default function EnvironmentPanel() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4 p-4 bg-transparent text-surface-100">
+      {!isOnline && (
+        <div className=" gap-2 flex justify-center items-center text-sm text-surface-200/95 p-1.5 border border-warn/80 rounded-lg text-center bg-warn/10">
+          <span className="text-warn"><WarningIcon/></span><span>Variables might be stale, server not connected.</span>
+        </div>
+      )}
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold tracking-wide">
