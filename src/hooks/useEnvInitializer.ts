@@ -14,7 +14,6 @@ export const useEnvInitializer = () => {
   const setEnvInstance = useEnvInstanceStore((s) => s.setEnv);
 
   useEffect(() => {
-    let aborted = false;
     const controller = new AbortController();
 
     const initialize = async () => {
@@ -28,14 +27,14 @@ export const useEnvInitializer = () => {
         // 2. Try to use cached server instance, if any
         const cached = await envInstanceStorage.get();
 
-        if (cached && !aborted) {
+        if (cached) {
           setEnvInstance(cached.instance);
 
           const merged = mergeEnvVars(cached.instance, localSnapshot);
           setVars(merged);
 
           // Background validation against live server
-          validateCache(cached, controller.signal);
+          validateEnvCache(cached, controller.signal);
           return;
         }
 
@@ -43,7 +42,6 @@ export const useEnvInitializer = () => {
         const env = await getEnvironment();
         const pong = await ping(); // uptime string
 
-        if (aborted) return;
 
         await envInstanceStorage.save(env, pong.uptime);
         setEnvInstance(env);
@@ -52,8 +50,6 @@ export const useEnvInitializer = () => {
         setVars(merged);
       } catch (err) {
         console.error("Env initializer failed:", err);
-
-        if (aborted) return;
 
         // 4. If network failed but we have no cached instance,
         //    we already hydrated from DB in step 1.
@@ -69,7 +65,6 @@ export const useEnvInitializer = () => {
     initialize();
 
     return () => {
-      aborted = true;
       controller.abort();
     };
   }, [setEnvInstance, setVars]);
@@ -144,15 +139,15 @@ const mergeEnvVars = (
 };
 
 // ----------------- VALIDATION LAYER -----------------
-const validateCache = async (
-  cached: { instance: Environment; uptime: string },
+export const validateEnvCache = async (
+  cached: { instance: Environment ; uptime: string } | null,
   signal: AbortSignal
 ) => {
   try {
     const pong = await ping();
     if (signal.aborted) return;
 
-    if (pong.uptime !== cached.uptime) {
+    if (pong.uptime !== cached?.uptime) {
       // server config changed
       const freshEnv = await getEnvironment();
       await envInstanceStorage.save(freshEnv, pong.uptime);

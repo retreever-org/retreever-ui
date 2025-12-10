@@ -8,6 +8,7 @@ import { FloatingDock } from "./layouts/FloatingDock";
 import UtilityBar from "./layouts/UtilityBar";
 import { RightDisplayPanel } from "./components/utility/RightDisplayPanel";
 import { useEnvInitializer } from "./hooks/useEnvInitializer";
+import "./services/auto-refresh-service"
 
 function App() {
   const isInitializing = useIsInitializing();

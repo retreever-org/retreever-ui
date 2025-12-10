@@ -50,7 +50,7 @@ export const useDocStore = create<DocState>()((set) => ({
 // Getter for uptime (from doc)
 export const useDocUptime = () => {
   const doc = useDocStore((s) => s.doc);
-  return doc?.up_time || null;
+  return doc?.up_time;
 };
 
 // Selector hooks

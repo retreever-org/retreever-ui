@@ -29,7 +29,7 @@ export const useAppInitializer = () => {
           docStore.setCollections(getSidebarCollections(cachedDoc))
           
           // Background validation
-          validateCache(cachedDoc, controller.signal).catch(console.error)
+          validateDocCache(cachedDoc, controller.signal).catch(console.error)
         } else if (!aborted) {
           const doc = await getRetreeverDoc()
           await docStorage.saveDoc(doc)
@@ -67,15 +67,14 @@ export const useAppInitializer = () => {
   }, []) // EMPTY deps = runs ONCE
 }
 
-const validateCache = async (cachedDoc: RetreeverDoc, signal: AbortSignal) => {
+export const validateDocCache = async (cachedDoc: RetreeverDoc | null, signal: AbortSignal) => {
   try {
     const pingResponse = await ping()
     if (signal.aborted) return
     
-    console.log("setting online!");
     useApiHealthStore.getState().setOnline()
     
-    if (cachedDoc.up_time !== pingResponse.uptime) {
+    if (cachedDoc?.up_time !== pingResponse.uptime) {
       const freshDoc = await getRetreeverDoc()
       await docStorage.saveDoc(freshDoc)
       useDocStore.getState().setDoc(freshDoc)
