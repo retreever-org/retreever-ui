@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useRightPanelStore } from "../../stores/right-panel-store";
-import { LeftDoubleIcon } from "../../svgs/svgs";
+import { DetachIcon, LeftDoubleIcon } from "../../svgs/svgs";
+import { useUtilityViewState } from "../../stores/utility-view-store";
+import { useDockStore } from "../../stores/dock-store";
+import UtilityHeader from "./UtilityHeader";
 
 export function RightDisplayPanel() {
-  const { isPanelOpen, content, maxWidth } = useRightPanelStore();
+  const { isPanelOpen, maxWidth, closePanel } = useRightPanelStore();
+  const { content, detach, title } = useUtilityViewState();
+  const { openDock } = useDockStore();
 
   const [width, setWidth] = useState(360);
   const [visible, setVisible] = useState(isPanelOpen);
@@ -12,9 +17,7 @@ export function RightDisplayPanel() {
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
-  // ------------------------------------------
-  // Visibility timing for slide animation
-  // ------------------------------------------
+  // ------------------------ Visibility timing for slide animation ------------------------
   useEffect(() => {
     if (isPanelOpen) {
       setVisible(true);
@@ -26,9 +29,7 @@ export function RightDisplayPanel() {
 
   if (!visible) return null;
 
-  // ------------------------------------------
-  // Left-edge resize logic
-  // ------------------------------------------
+  // ------------------------- Left-edge resize logic -------------------------
   function startResize(e: React.MouseEvent) {
     e.preventDefault();
 
@@ -55,7 +56,8 @@ export function RightDisplayPanel() {
   return (
     <div
       ref={panelRef}
-      className="fixed h-[calc(100vh-49px)]" // BELOW navbar
+      className="fixed h-[calc(100vh-49px)] bg-linear-to-b from-surface-700 to-surface-800 
+          border-l border-surface-500/40 shadow-xl" // BELOW navbar
       style={{
         top: NAVBAR_HEIGHT,
         right: 48, // stays next to UtilityBar
@@ -65,20 +67,38 @@ export function RightDisplayPanel() {
         transition: "transform 0.2s ease-out",
       }}
     >
-      <div
-        className="
-          h-full flex
-          bg-linear-to-b from-surface-700 to-surface-800
-          border-l border-surface-500/40 shadow-xl
-        "
-      >
-
-        {/* CONTENT */}
-        <div className="overflow-auto h-full flex-1">{content}</div>
-
-        {/* LEFT RESIZE HANDLE */}
+      <div className="overflow-auto scroll-thin h-full">
+        {/* <div className="flex justify-end px-4 py-2 ">
+          <button
+            className="cursor-pointer text-surface-300 hover:text-surface-200"
+            onClick={() => {
+              detach();
+              closePanel();
+              openDock();
+            }}
+          >
+            <DetachIcon />
+          </button>
+        </div> */}
+        <UtilityHeader
+          title={title}
+          onSwitchView={() => {
+            detach();
+            closePanel();
+            openDock();
+          }}
+        />
         <div
           className="
+          h-full flex
+        "
+        >
+          {/* CONTENT */}
+          <div className="flex-1">{content}</div>
+
+          {/* LEFT RESIZE HANDLE */}
+          <div
+            className="
           absolute left-0 top-0 h-full 
           flex justify-center items-center
           w-2.5 
@@ -87,9 +107,10 @@ export function RightDisplayPanel() {
           hover:bg-surface-500/20 
           active:bg-surface-500/40
         "
-          onMouseDown={startResize}
-        >
-          <LeftDoubleIcon />
+            onMouseDown={startResize}
+          >
+            <LeftDoubleIcon />
+          </div>
         </div>
       </div>
     </div>

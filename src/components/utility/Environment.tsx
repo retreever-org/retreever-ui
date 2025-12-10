@@ -3,7 +3,6 @@ import type { ResolvedVariable } from "../../types/env.types";
 import "../../storage/env-sync";
 import { DeleteIcon, WarningIcon } from "../../svgs/svgs";
 import { useApiHealthStore } from "../../stores/api-state-store";
-import { div } from "framer-motion/client";
 
 export default function EnvironmentPanel() {
   const { vars, updateValue, updateKey, deleteVar } = useEnvVarsStore();
@@ -34,19 +33,6 @@ export default function EnvironmentPanel() {
           <span className="text-warn"><WarningIcon/></span><span>Variables might be stale, server not connected.</span>
         </div>
       )}
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-wide">
-          Environment Variables
-        </h2>
-
-        <button
-          className="px-3 py-1 rounded-md text-sm font-medium text-white
-                     bg-linear-to-br from-primary-400 to-primary-500 hover:opacity-90 cursor-pointer"
-        >
-          Learn
-        </button>
-      </div>
 
       {/* INFO */}
       <p className="text-sm text-surface-400 leading-relaxed">

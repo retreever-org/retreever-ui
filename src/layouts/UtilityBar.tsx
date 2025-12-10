@@ -1,26 +1,59 @@
 import React, { useCallback, useEffect } from "react";
 import { DocumentIcon, ShortcutIcon, VariableIcon } from "../svgs/svgs";
 import { useRightPanelStore } from "../stores/right-panel-store";
-import { useDockStore } from "../stores/dock-store";
 import Shortcut from "../components/utility/Shortcut";
 import EnvironmentVars from "../components/utility/Environment";
+import DocumentDisplay from "./DocumentDisplay";
+import { useUtilityViewState } from "../stores/utility-view-store";
+import { useDockStore } from "../stores/dock-store";
+
+export type UtilityItem = "Documentation" | "Environment Variables" | "Shortcuts";
 
 const UtilityBar: React.FC = () => {
-  const { closePanel, openPanel, panelName } = useRightPanelStore();
-  const { open, openDock, closeDock } = useDockStore();
+  const { closePanel, openPanel } = useRightPanelStore();
+  const { openDock, closeDock } = useDockStore();
+  const { viewMode, title, setTitle, setContent, clearView } = useUtilityViewState();
 
-  const handleClick = useCallback(
-    (element: React.ReactNode, newPanelName: string) => {
-      if (panelName === newPanelName) {
+  const viewInSidePanel = useCallback(
+    (element: React.ReactNode, newPanelName: UtilityItem) => {
+      if (title === newPanelName) {
         closePanel();
+        clearView();
         return;
       }
-      openPanel(element, newPanelName);
+      setTitle(newPanelName);
+      setContent(element);
+      openPanel();
     },
-    [panelName, closePanel, openPanel]
+    [title, closePanel, openPanel]
   );
 
-  // Keyboard shortcuts: run once, use the stable handleClick
+  const viewInFloatingPanel = useCallback(
+    (element: React.ReactNode, newPanelName: UtilityItem) => {
+      if (title === newPanelName) {
+        closeDock();
+        clearView();
+        return;
+      }
+      setTitle(newPanelName);
+      setContent(element);
+      openDock();
+    },
+    [title, closeDock, openDock]
+  );
+
+  const handleSelect = (
+    element: React.ReactNode,
+    newPanelName: UtilityItem
+  ) => {
+    if (viewMode === "attached") {
+      viewInSidePanel(element, newPanelName);
+    } else if (viewMode === "detached") {
+      viewInFloatingPanel(element, newPanelName);
+    }
+  };
+
+  // Keyboard shortcuts: run once, use the stable handleSelect
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -33,39 +66,38 @@ const UtilityBar: React.FC = () => {
       // Ctrl + /
       if (e.ctrlKey && (e.key === "/" || e.code === "Slash")) {
         e.preventDefault();
-        handleClick(<Shortcut />, "shortcut-btn");
+        handleSelect(<Shortcut />, "Shortcuts");
         return;
       }
 
       // Alt + Shift + E
       if (e.altKey && e.shiftKey && e.key.toLowerCase() === "e") {
         e.preventDefault();
-        handleClick(<EnvironmentVars />, "env-btn");
+        handleSelect(<EnvironmentVars />, "Environment Variables");
         return;
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [handleClick]);
+  }, [handleSelect]);
 
   return (
     <div
       id="utility-drawer"
       className="absolute z-20 bg-linear-to-b from-surface-700 to-surface-800 top-0 right-0 h-full w-12 border-l border-surface-500/30 flex flex-col items-center"
     >
-      
       <Button
         icon={<DocumentIcon />}
-        onClick={() => (open ? closeDock() : openDock())}
+        onClick={() => handleSelect(<DocumentDisplay />, "Documentation")}
       />
       <Button
         icon={<VariableIcon />}
-        onClick={() => handleClick(<EnvironmentVars />, "env-btn")}
+        onClick={() => handleSelect(<EnvironmentVars />, "Environment Variables")}
       />
       <Button
         icon={<ShortcutIcon />}
-        onClick={() => handleClick(<Shortcut />, "shortcut-btn")}
+        onClick={() => handleSelect(<Shortcut />, "Shortcuts")}
       />
     </div>
   );

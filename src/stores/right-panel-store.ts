@@ -2,12 +2,10 @@ import { create } from "zustand";
 
 interface RightPanelState {
   isPanelOpen: boolean;
-  content: React.ReactNode | null;
   width: number;
-  panelName: string | null;
   maxWidth: number;
 
-  openPanel: (content: React.ReactNode, panelName: string) => void;
+  openPanel: () => void;
   closePanel: () => void;
   setWidth: (w: number) => void;
   setMaxWidth: (mw: number) => void;
@@ -20,8 +18,8 @@ export const useRightPanelStore = create<RightPanelState>((set) => ({
   panelName: null,
   maxWidth: 700,
 
-  openPanel: (content, panelName) => set({ isPanelOpen: true, content, panelName: panelName }),
-  closePanel: () => set({ isPanelOpen: false, panelName: null }),
+  openPanel: () => set({ isPanelOpen: true }),
+  closePanel: () => set({ isPanelOpen: false }),
   setWidth: (width) => set({ width }),
   setMaxWidth: (max) => set({maxWidth: max})
 }));

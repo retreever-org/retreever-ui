@@ -9,6 +9,7 @@ import UtilityBar from "./layouts/UtilityBar";
 import { RightDisplayPanel } from "./components/utility/RightDisplayPanel";
 import { useEnvInitializer } from "./hooks/useEnvInitializer";
 import "./services/auto-refresh-service";
+import DocumentDisplay from "./layouts/DocumentDisplay";
 
 function App() {
   const isInitializing = useIsInitializing();
@@ -40,7 +41,7 @@ function App() {
         <RightDisplayPanel />
       </div>
 
-      <FloatingDock />
+      <FloatingDock title="Documentation" content={<DocumentDisplay />} />
     </div>
   );
 }

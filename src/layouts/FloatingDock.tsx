@@ -1,8 +1,14 @@
-import { Rnd } from "react-rnd"
-import { useDockStore } from "../stores/dock-store"
-import { useEffect, useState } from "react"
-import DocumentDisplay from "./DocumentDisplay"
-import { XMarkIcon } from "../svgs/svgs"
+import { Rnd } from "react-rnd";
+import { useDockStore } from "../stores/dock-store";
+import { useEffect, useState } from "react";
+import { SidePanelIcon, XMarkIcon } from "../svgs/svgs";
+import { useUtilityViewState } from "../stores/utility-view-store";
+import { useRightPanelStore } from "../stores/right-panel-store";
+
+export interface FloatingDockProps {
+  title: string;
+  content: React.ReactNode;
+}
 
 export function FloatingDock() {
   const {
@@ -15,32 +21,37 @@ export function FloatingDock() {
     setSize,
     closeDock,
     toggleDock,
-  } = useDockStore()
+  } = useDockStore();
 
-  const [visible, setVisible] = useState(open)
-  const [docked, setDocked] = useState(false)
+  const [visible, setVisible] = useState(open);
+  const [docked, setDocked] = useState(false);
 
-  const HEADER_HEIGHT = 36
+  const { viewMode, title, content, clearView, attach } = useUtilityViewState();
+  const {openPanel} = useRightPanelStore();
+
+  const HEADER_HEIGHT = 36;
 
   // open/close with animation delay
   useEffect(() => {
-    if (open) setVisible(true)
-    else setTimeout(() => setVisible(false), 120)
-  }, [open])
+    if (open) setVisible(true);
+    else setTimeout(() => setVisible(false), 120);
+  }, [open]);
 
   // keyboard shortcut
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
-        e.preventDefault()
-        toggleDock()
-      }
+    if (viewMode === "detached") {
+      const handler = (e: KeyboardEvent) => {
+        if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
+          e.preventDefault();
+          toggleDock();
+        }
+      };
+      window.addEventListener("keydown", handler);
+      return () => window.removeEventListener("keydown", handler);
     }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-  }, [toggleDock])
+  }, [toggleDock]);
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <Rnd
@@ -50,52 +61,52 @@ export function FloatingDock() {
       minWidth={450}
       minHeight={370}
       style={{ position: "fixed", zIndex: 9999 }}
-
       onDrag={(_e, d) => {
-        const screenH = window.innerHeight
+        const screenH = window.innerHeight;
 
         // If docked and user drags upward → undock
         if (docked && d.y < screenH - HEADER_HEIGHT - 10) {
-          setDocked(false)
+          setDocked(false);
         }
       }}
-
       onDragStop={(_, d) => {
-        const screenW = window.innerWidth
-        const screenH = window.innerHeight
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
 
-        let newX = d.x
-        let newY = d.y
+        let newX = d.x;
+        let newY = d.y;
 
         // Prevent left/right off-screen movement
-        newX = Math.max(0, Math.min(newX, screenW - width))
+        newX = Math.max(0, Math.min(newX, screenW - width));
 
         // Prevent going above the screen
-        newY = Math.max(0, newY)
+        newY = Math.max(0, newY);
 
         // Allow ONLY bottom off-screen docking
         if (newY > screenH * 0.8) {
-          setDocked(true)
-          setPosition(newX, screenH - HEADER_HEIGHT)
-          return
+          setDocked(true);
+          setPosition(newX, screenH - HEADER_HEIGHT);
+          return;
         }
 
         // Normal floating
-        setDocked(false)
-        setPosition(newX, newY)
+        setDocked(false);
+        setPosition(newX, newY);
       }}
-
       onResizeStop={(_, __, ref, ___, pos) => {
-        const screenW = window.innerWidth
-        const screenH = window.innerHeight
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
 
-        setSize(parseFloat(ref.style.width), parseFloat(ref.style.height))
+        setSize(parseFloat(ref.style.width), parseFloat(ref.style.height));
 
         // Clamp resize position (only top and sides)
-        const clampedX = Math.max(0, Math.min(pos.x, screenW - parseFloat(ref.style.width)))
-        const clampedY = Math.max(0, Math.min(pos.y, screenH - HEADER_HEIGHT))
+        const clampedX = Math.max(
+          0,
+          Math.min(pos.x, screenW - parseFloat(ref.style.width))
+        );
+        const clampedY = Math.max(0, Math.min(pos.y, screenH - HEADER_HEIGHT));
 
-        setPosition(clampedX, clampedY)
+        setPosition(clampedX, clampedY);
       }}
     >
       <div
@@ -112,30 +123,45 @@ export function FloatingDock() {
         <div className="dock-header flex items-center justify-between px-3 py-1.5 border-b border-surface-500/30 cursor-grab select-none">
           <span className="flex items-center gap-2 text-xs font-medium text-slate-200/80">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-            Documentation
+            {title}
           </span>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              closeDock()
-            }}
-            className="h-6 w-6 inline-flex items-center justify-center rounded-md border 
-                       border-surface-500/30 hover:border-rose-500/10 hover:bg-rose-500/20"
-          >
-            <span className="text-surface-300 hover:text-rose-400">
-              <XMarkIcon />
-            </span>
-          </button>
+          <div className="space-x-2 flex justify-center items-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                closeDock();
+                attach();
+                openPanel();
+              }}
+              className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer"
+            >
+              <span className="text-surface-300 hover:text-surface-200 scale-95">
+                <SidePanelIcon/>
+              </span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                closeDock();
+                clearView();
+              }}
+              className="h-6 w-6 inline-flex items-center justify-center rounded-md border 
+                       border-surface-500/30 hover:border-rose-500/10 hover:bg-rose-500/20 cursor-pointer"
+            >
+              <span className="text-surface-300 hover:text-rose-400">
+                <XMarkIcon />
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Body (hidden when docked) */}
         {!docked && (
-          <div className="flex-1 overflow-auto p-4">
-            <DocumentDisplay />
-          </div>
+          <div className="flex-1 overflow-auto scroll-thin p-4">{content}</div>
         )}
       </div>
     </Rnd>
-  )
+  );
 }
