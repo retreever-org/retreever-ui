@@ -9,7 +9,7 @@ const Metadata: React.FC<MetadataProp> = ({ data, closeMetadata }) => {
   const entries = Object.entries(data);
 
   return (
-    <section className="text-sm text-surface-200">
+    <section className="text-xs text-surface-200">
       <table className="w-full border-collapse bg-black/10">
         <thead>
           <tr className="border border-surface-500 bg-black/20">

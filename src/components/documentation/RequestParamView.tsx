@@ -47,7 +47,7 @@ const RequestParamView: React.FC<RequestParams> = ({
 
   const paramGroups = [
     {
-      label: "Path Variables",
+      label: "Path Variables:",
       items:
         pathVariables?.map((p) => ({
           name: p.name,
@@ -58,7 +58,7 @@ const RequestParamView: React.FC<RequestParams> = ({
         })) || [],
     },
     {
-      label: "Query Params",
+      label: "Query Params:",
       items:
         queryParams?.map((q) => ({
           name: q.name,
@@ -70,7 +70,7 @@ const RequestParamView: React.FC<RequestParams> = ({
         })) || [],
     },
     {
-      label: "Headers",
+      label: "Headers:",
       items:
         headers?.map((h) => ({
           name: h.name,

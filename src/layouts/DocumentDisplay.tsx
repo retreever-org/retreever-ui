@@ -5,6 +5,7 @@ import { CheckIcon, ErrorIcon, InfoIcon, SparkIcon } from "../svgs/svgs";
 import type { FieldMetadata } from "../types/response.types";
 import Metadata from "../components/documentation/Metadata";
 import RequestParamView from "../components/documentation/RequestParamView";
+import FormType from "../components/documentation/FormType";
 
 const DocumentDisplay: React.FC = () => {
   const endpoint = useViewingEndpoint();
@@ -52,25 +53,48 @@ const DocumentDisplay: React.FC = () => {
 
       {/* REQUEST SECTION */}
 
-      <RequestParamView
-        headers={endpoint?.headers}
-        pathVariables={endpoint?.path_variables}
-        queryParams={endpoint?.query_params}
-      />
-
-      {request && (
-        <SwitchableViewWithTitle
-          title="Request Body"
-          icon={
+      <div className="space-y-2">
+        {(endpoint.path_variables?.length > 0 ||
+          endpoint.query_params?.length > 0 ||
+          endpoint.headers?.length > 0 ||
+          request) && (
+          <h3 className="flex items-center gap-1.5 px-2 text-md font-medium text-surface-200">
             <span className="text-primary-400">
               <InfoIcon />
-            </span>
-          }
-          model={request?.model}
-          example={request?.example_model}
-          metadata={request?.metadata}
-        />
-      )}
+            </span>{" "}
+            <span>Request</span>
+          </h3>
+        )}
+
+        {(endpoint.path_variables?.length > 0 ||
+          endpoint.query_params?.length > 0 ||
+          endpoint.headers?.length > 0) && (
+          <div className="my-4">
+            <RequestParamView
+              headers={endpoint?.headers}
+              pathVariables={endpoint?.path_variables}
+              queryParams={endpoint?.query_params}
+            />
+          </div>
+        )}
+
+        {request && (
+          <>
+            <div className="text-surface-200 text-sm font-normal font-mono px-3 py-2 mt-4 bg-black/10 border border-surface-500/50 rounded-xl">
+              <div>
+                ContentType:{" "}
+                <span className="text-success/80">{endpoint.consumes}</span>
+              </div>
+            </div>
+            <SwitchableViewWithTitle
+              model={request?.model}
+              example={request?.example_model}
+              metadata={request?.metadata}
+              contentTypes={endpoint.consumes}
+            />
+          </>
+        )}
+      </div>
 
       {/* RESPONSE SECTION */}
 
@@ -82,14 +106,24 @@ const DocumentDisplay: React.FC = () => {
           <span>Response</span>
         </h3>
 
-        <p className="text-surface-200 text-sm font-normal font-mono px-3 py-2 mt-4 bg-black/10 border border-surface-500/50 rounded-xl">
-          Status: <span className="text-success/80">{endpoint.status_code} - {endpoint.status}</span>
-        </p>
+        <div className="text-surface-200 text-sm font-normal font-mono px-3 py-2 mt-4 bg-black/10 border border-surface-500/50 rounded-xl">
+          <div>
+            Status:{" "}
+            <span className="text-success/80">
+              {endpoint.status_code} - {endpoint.status}
+            </span>
+          </div>
+          <div>
+            ContentType:{" "}
+            <span className="text-success/80">{endpoint.produces}</span>
+          </div>
+        </div>
 
         {response && (
           <SwitchableViewWithTitle
             model={response?.model}
             example={response?.example_model}
+            contentTypes={endpoint.produces}
           />
         )}
       </div>
@@ -125,6 +159,7 @@ const DocumentDisplay: React.FC = () => {
               <SwitchableView
                 model={err.response?.model}
                 example={err.response?.example_model}
+                contentTypes={endpoint.produces}
               />
             </div>
           ))}
@@ -144,6 +179,7 @@ interface ModelDisplayProps {
   model: string | undefined;
   example: string | undefined;
   metadata?: Record<string, FieldMetadata> | undefined;
+  contentTypes?: string[];
 }
 
 function SwitchableViewWithTitle({
@@ -152,6 +188,7 @@ function SwitchableViewWithTitle({
   model,
   example,
   metadata,
+  contentTypes,
 }: ModelDisplayProps) {
   return (
     <section className="space-y-4">
@@ -161,7 +198,12 @@ function SwitchableViewWithTitle({
           <span>{title}</span>
         </h3>
       </div>
-      <SwitchableView model={model} example={example} metadata={metadata} />
+      <SwitchableView
+        model={model}
+        example={example}
+        metadata={metadata}
+        contentTypes={contentTypes}
+      />
     </section>
   );
 }
@@ -172,23 +214,46 @@ interface SwitchableViewProp {
   model: string | undefined;
   example: string | undefined;
   metadata?: Record<string, FieldMetadata> | undefined;
+  contentTypes?: string[];
 }
 
-function SwitchableView({ model, example, metadata }: SwitchableViewProp) {
+function SwitchableView({
+  model,
+  example,
+  metadata,
+  contentTypes,
+}: SwitchableViewProp) {
   const [viewMetadata, setViewMetadata] = useState<boolean>();
 
-  return (
-    <>
-      {viewMetadata && metadata ? (
-        <Metadata data={metadata} closeMetadata={setViewMetadata} />
-      ) : (
-        <CodeBlock
-          code={model}
-          example={example}
-          swapCodeBlock={setViewMetadata}
-          swappable={metadata !== undefined}
-        />
-      )}
-    </>
-  );
+  if (viewMetadata && metadata) {
+    return <Metadata data={metadata} closeMetadata={setViewMetadata} />;
+  }
+  if (
+    contentTypes &&
+    contentTypes.some((c) => c.toLocaleLowerCase() === "application/json")
+  ) {
+    return (
+      <CodeBlock
+        code={model}
+        example={example}
+        swapCodeBlock={setViewMetadata}
+        swappable={metadata !== undefined}
+      />
+    );
+  }
+  if (
+    contentTypes &&
+    contentTypes.some(
+      (c) => c.toLocaleLowerCase() === "application/x-www-form-urlencoded"
+    )
+  ) {
+    return (
+      <FormType
+        code={model}
+        example={example}
+        swapCodeBlock={setViewMetadata}
+        swappable={metadata !== undefined}
+      />
+    );
+  }
 }

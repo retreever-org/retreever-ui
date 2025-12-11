@@ -44,6 +44,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
 
   return (
     <div className="group bg-black/10 border border-surface-500/50 px-2 pt-2 rounded-xl relative">
+      
       {/* Header Row */}
       <div className="w-full flex justify-end items-center space-x-2">
         {/* View Switch */}
