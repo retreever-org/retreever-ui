@@ -67,5 +67,5 @@ export const saveSidebarLayout = async (state: SidebarLayoutPersisted) => {
 
 export const loadSidebarLayout = async () => {
   const data = await layoutDB.getItem<SidebarLayoutPersisted>(KEYS.sidebar);
-  return data ?? { width: 288 }; // default
+  return data ?? { width: 288, openMap: {} };
 };

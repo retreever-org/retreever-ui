@@ -33,7 +33,7 @@ const UtilityHeader: React.FC<UtilityHeaderProps> = ({
           </span>
         </button>
 
-        {viewMode === "detached" && (
+        {/* {viewMode === "detached" && ( */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -46,7 +46,7 @@ const UtilityHeader: React.FC<UtilityHeaderProps> = ({
               <XMarkIcon />
             </span>
           </button>
-        )}
+        {/* )} */}
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ export type DockLayoutPersisted = {
 
 export type SidebarLayoutPersisted = {
   width: number;
+  openMap: Record<string, boolean>;
 };
 
 export type LayoutSnapshot = {

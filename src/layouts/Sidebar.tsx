@@ -23,12 +23,14 @@ const Sidebar: React.FC = () => {
   const doc = useDoc();
 
   const [width, setWidth] = useState(MIN_WIDTH);
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
-  // hydrate width on mount
+  // hydrate width + openMap on mount
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { width: storedWidth } = await loadSidebarLayout();
+      const { width: storedWidth, openMap: storedOpenMap } =
+        await loadSidebarLayout();
       if (cancelled) return;
 
       const clamped = Math.min(
@@ -36,25 +38,32 @@ const Sidebar: React.FC = () => {
         window.innerWidth * MAX_WIDTH_RATIO
       );
 
+      // ensure all current collections have a key
+      const initialOpenMap = collections.reduce((acc, col) => {
+        acc[col.name] = storedOpenMap?.[col.name] ?? false; // default closed if unknown
+        return acc;
+      }, {} as Record<string, boolean>);
+
       setWidth(clamped);
-      setIsReady(true); // sidebar can render now
+      setOpenMap(initialOpenMap);
+      setIsReady(true);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [collections]);
 
-  // persist width when it changes (debounced)
+  // persist width + openMap when either changes (debounced)
   useEffect(() => {
-    if (!isReady) return; // avoid writing initial default
+    if (!isReady) return;
     const id = setTimeout(() => {
-      void saveSidebarLayout({ width });
+      void saveSidebarLayout({ width, openMap });
     }, 200);
     return () => clearTimeout(id);
-  }, [width, isReady]);
+  }, [width, openMap, isReady]);
 
-  // --- Resize Handler ---
+  // --- Resize Handler --- (unchanged)
   const startResize = (e: React.MouseEvent) => {
     e.preventDefault();
     const startX = e.clientX;
@@ -81,13 +90,6 @@ const Sidebar: React.FC = () => {
   };
 
   // -------- EXPAND/COLLAPSE ----------
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>(() =>
-    collections.reduce((acc, col) => {
-      acc[col.name] = false;
-      return acc;
-    }, {} as Record<string, boolean>)
-  );
-
   const toggleCollection = (name: string) =>
     setOpenMap((prev) => ({ ...prev, [name]: !prev[name] }));
 
@@ -107,8 +109,10 @@ const Sidebar: React.FC = () => {
       }, {} as Record<string, boolean>)
     );
 
+  if (!isReady) return null;
+
   if (!isReady) {
-    return null; // or a skeleton that uses the same final width logic
+    return null; // placeholder
   }
 
   return (

@@ -15,7 +15,7 @@ export function RightDisplayPanel() {
     setWidth,
   } = useRightPanelStore();
 
-  const { detach, title } = useUtilityViewState();
+  const { detach, title, clearView } = useUtilityViewState();
   const content = getUtilityContent(title);
   const { openDock } = useDockStore();
 
@@ -80,6 +80,10 @@ export function RightDisplayPanel() {
             detach();
             closePanel();
             openDock();
+          }}
+          onclose={() => {
+            closePanel();
+            clearView();
           }}
         />
         <div className="h-full flex overflow-auto scroll-thin">
