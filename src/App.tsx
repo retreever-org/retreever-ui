@@ -9,13 +9,14 @@ import UtilityBar from "./layouts/UtilityBar";
 import { RightDisplayPanel } from "./components/utility/RightDisplayPanel";
 import { useEnvInitializer } from "./hooks/useEnvInitializer";
 import "./services/auto-refresh-service";
-import DocumentDisplay from "./layouts/DocumentDisplay";
+import { initLayoutPersistence } from "./services/layout-persistence-service";
 
 function App() {
   const isInitializing = useIsInitializing();
   useAppInitializer();
   useApiHealthMonitor();
   useEnvInitializer();
+  initLayoutPersistence();
 
   if (isInitializing) {
     return (
@@ -41,7 +42,7 @@ function App() {
         <RightDisplayPanel />
       </div>
 
-      <FloatingDock title="Documentation" content={<DocumentDisplay />} />
+      <FloatingDock/>
     </div>
   );
 }

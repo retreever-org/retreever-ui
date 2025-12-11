@@ -1,9 +1,7 @@
+// UtilityBar.tsx
 import React, { useCallback, useEffect } from "react";
 import { DocumentIcon, ShortcutIcon, VariableIcon } from "../svgs/svgs";
 import { useRightPanelStore } from "../stores/right-panel-store";
-import Shortcut from "../components/utility/Shortcut";
-import EnvironmentVars from "../components/utility/Environment";
-import DocumentDisplay from "./DocumentDisplay";
 import { useUtilityViewState } from "../stores/utility-view-store";
 import { useDockStore } from "../stores/dock-store";
 
@@ -15,49 +13,45 @@ export type UtilityItem =
 const UtilityBar: React.FC = () => {
   const { closePanel, openPanel } = useRightPanelStore();
   const { openDock, closeDock } = useDockStore();
-  const { viewMode, title, setTitle, setContent, clearView } =
-    useUtilityViewState();
+  const { viewMode, title, setTitle, clearView } = useUtilityViewState();
 
   const viewInSidePanel = useCallback(
-    (element: React.ReactNode, newPanelName: UtilityItem) => {
+    (newPanelName: UtilityItem) => {
       if (title === newPanelName) {
         closePanel();
         clearView();
         return;
       }
+
       setTitle(newPanelName);
-      setContent(element);
       openPanel();
     },
-    [title, closePanel, openPanel]
+    [title, closePanel, openPanel, setTitle, clearView],
   );
 
   const viewInFloatingPanel = useCallback(
-    (element: React.ReactNode, newPanelName: UtilityItem) => {
+    (newPanelName: UtilityItem) => {
       if (title === newPanelName) {
         closeDock();
         clearView();
         return;
       }
+
       setTitle(newPanelName);
-      setContent(element);
       openDock();
     },
-    [title, closeDock, openDock]
+    [title, closeDock, openDock, setTitle, clearView],
   );
 
-  const handleSelect = (
-    element: React.ReactNode,
-    newPanelName: UtilityItem
-  ) => {
+  const handleSelect = (newPanelName: UtilityItem) => {
     if (viewMode === "attached") {
-      viewInSidePanel(element, newPanelName);
-    } else if (viewMode === "detached") {
-      viewInFloatingPanel(element, newPanelName);
+      viewInSidePanel(newPanelName);
+    } else {
+      viewInFloatingPanel(newPanelName);
     }
   };
 
-  // Keyboard shortcuts: run once, use the stable handleSelect
+  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -67,24 +61,21 @@ const UtilityBar: React.FC = () => {
         target.isContentEditable;
       if (isTextInput) return;
 
-      // Ctrl + /
       if (e.ctrlKey && (e.key === "/" || e.code === "Slash")) {
         e.preventDefault();
-        handleSelect(<Shortcut />, "Shortcuts");
+        handleSelect("Shortcuts");
         return;
       }
 
-      // Alt + Shift + E
       if (e.altKey && e.shiftKey && e.key.toLowerCase() === "e") {
         e.preventDefault();
-        handleSelect(<EnvironmentVars />, "Environment Variables");
+        handleSelect("Environment Variables");
         return;
       }
 
-      // Alt + Shift + D
-      if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
+      if (e.altKey && e.shiftKey && e.key.toLowerCase() === "d") {
         e.preventDefault();
-        handleSelect(<DocumentDisplay />, "Documentation");
+        handleSelect("Documentation");
         return;
       }
     };
@@ -98,27 +89,15 @@ const UtilityBar: React.FC = () => {
       id="utility-drawer"
       className="absolute z-20 bg-linear-to-b from-surface-700 to-surface-800 top-0 right-0 h-full w-12 border-l border-surface-500/30 flex flex-col items-center"
     >
-      <Button
-        icon={<DocumentIcon />}
-        onClick={() => handleSelect(<DocumentDisplay />, "Documentation")}
-      />
-      <Button
-        icon={<VariableIcon />}
-        onClick={() =>
-          handleSelect(<EnvironmentVars />, "Environment Variables")
-        }
-      />
-      <Button
-        icon={<ShortcutIcon />}
-        onClick={() => handleSelect(<Shortcut />, "Shortcuts")}
-      />
+      <Button icon={<DocumentIcon />} onClick={() => handleSelect("Documentation")} />
+      <Button icon={<VariableIcon />} onClick={() => handleSelect("Environment Variables")} />
+      <Button icon={<ShortcutIcon />} onClick={() => handleSelect("Shortcuts")} />
     </div>
   );
 };
 
 export default UtilityBar;
 
-// ---------------------------- Button Component ----------------------------
 function Button({
   icon,
   onClick,
@@ -137,8 +116,7 @@ function Button({
         cursor-pointer
       "
     >
-      {/* Icon wrapper — only this animates */}
-      <span className="text-surface-300/80 w-full py-4 hover:text-surface-200 flex justify-center items-center  transition-transform active:scale-90 active:-translate-y-[0.05px]">
+      <span className="text-surface-300/80 w-full py-4 hover:text-surface-200 flex justify-center items-center transition-transform active:scale-90 active:-translate-y-[0.05px]">
         {icon}
       </span>
     </button>

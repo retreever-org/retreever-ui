@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface DockState {
+export interface DockState {
   open: boolean;
   x: number;
   y: number;

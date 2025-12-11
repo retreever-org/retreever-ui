@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { useUtilityViewState } from "../stores/utility-view-store";
 import { useRightPanelStore } from "../stores/right-panel-store";
 import UtilityHeader from "../components/utility/UtilityHeader";
-
-export interface FloatingDockProps {
-  title: string;
-  content: React.ReactNode;
-}
+import { getUtilityContent } from "../components/utility/UtilityContentFactory";
 
 export function FloatingDock() {
   const {
@@ -25,7 +21,8 @@ export function FloatingDock() {
   const [visible, setVisible] = useState(open);
   const [docked, setDocked] = useState(false);
 
-  const { title, content, clearView, attach } = useUtilityViewState();
+  const { title, clearView, attach } = useUtilityViewState();
+  const content = getUtilityContent(title);
   const { openPanel } = useRightPanelStore();
 
   const HEADER_HEIGHT = 36;

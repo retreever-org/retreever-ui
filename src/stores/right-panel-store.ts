@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface RightPanelState {
+export interface RightPanelState {
   isPanelOpen: boolean;
   width: number;
   maxWidth: number;
@@ -13,9 +13,7 @@ interface RightPanelState {
 
 export const useRightPanelStore = create<RightPanelState>((set) => ({
   isPanelOpen: false,
-  content: null,
   width: 360,
-  panelName: null,
   maxWidth: 700,
 
   openPanel: () => set({ isPanelOpen: true }),

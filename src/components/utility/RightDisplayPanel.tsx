@@ -4,20 +4,26 @@ import { LeftDoubleIcon } from "../../svgs/svgs";
 import { useUtilityViewState } from "../../stores/utility-view-store";
 import { useDockStore } from "../../stores/dock-store";
 import UtilityHeader from "./UtilityHeader";
+import { getUtilityContent } from "./UtilityContentFactory";
 
 export function RightDisplayPanel() {
-  const { isPanelOpen, maxWidth, closePanel } = useRightPanelStore();
-  const { content, detach, title } = useUtilityViewState();
+  const {
+    isPanelOpen,
+    width,
+    maxWidth,
+    closePanel,
+    setWidth,
+  } = useRightPanelStore();
+
+  const { detach, title } = useUtilityViewState();
+  const content = getUtilityContent(title);
   const { openDock } = useDockStore();
 
-  const [width, setWidth] = useState(360);
   const [visible, setVisible] = useState(isPanelOpen);
-
-  const NAVBAR_HEIGHT = 49; // your navbar height
-
+  const NAVBAR_HEIGHT = 49;
   const panelRef = useRef<HTMLDivElement | null>(null);
 
-  // ------------------------ Visibility timing for slide animation ------------------------
+  // Visibility timing for slide animation
   useEffect(() => {
     if (isPanelOpen) {
       setVisible(true);
@@ -29,7 +35,7 @@ export function RightDisplayPanel() {
 
   if (!visible) return null;
 
-  // ------------------------- Left-edge resize logic -------------------------
+  // Left-edge resize logic
   function startResize(e: React.MouseEvent) {
     e.preventDefault();
 
@@ -39,8 +45,8 @@ export function RightDisplayPanel() {
     function onMove(ev: MouseEvent) {
       const delta = startX - ev.clientX;
       let newWidth = startWidth + delta;
-
       newWidth = Math.max(420, Math.min(maxWidth, newWidth));
+
       setWidth(newWidth);
     }
 
@@ -57,10 +63,10 @@ export function RightDisplayPanel() {
     <div
       ref={panelRef}
       className="fixed h-[calc(100vh-49px)] bg-linear-to-b from-surface-700 to-surface-800 
-          border-l border-surface-500/40 shadow-xl" // BELOW navbar
+        border-l border-surface-500/40 shadow-xl"
       style={{
         top: NAVBAR_HEIGHT,
-        right: 48, // stays next to UtilityBar
+        right: 48,
         width,
         zIndex: 19,
         transform: isPanelOpen ? "translateX(0)" : "translateX(100%)",
@@ -76,27 +82,18 @@ export function RightDisplayPanel() {
             openDock();
           }}
         />
-        <div
-          className="
-          h-full flex 
-          overflow-auto scroll-thin
-        "
-        >
-          {/* CONTENT */}
+        <div className="h-full flex overflow-auto scroll-thin">
           <div className="flex-1 overflow-auto scroll-thin h-full">{content}</div>
 
-          {/* LEFT RESIZE HANDLE */}
           <div
             className="
-          absolute left-0 top-0 h-full 
-          overflow-auto scroll-thin
-          flex justify-center items-center
-          w-2.5 
-          cursor-ew-resize 
-          bg-transparent
-          hover:bg-surface-500/20 
-          active:bg-surface-500/40
-        "
+              absolute left-0 top-0 h-full 
+              flex justify-center items-center
+              w-2.5 cursor-ew-resize 
+              bg-transparent
+              hover:bg-surface-500/20 
+              active:bg-surface-500/40
+            "
             onMouseDown={startResize}
           >
             <LeftDoubleIcon />

@@ -1,19 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCollections, useDoc } from "../stores/doc-store";
 import type { Collection } from "../types/filtered.types";
 import { EndpointList } from "../components/sidebar/EndpointList";
-import { CollapseAll, ExpandAll, FolderIcon, FolderOpenIcon } from "../svgs/svgs";
+import {
+  CollapseAll,
+  ExpandAll,
+  FolderIcon,
+  FolderOpenIcon,
+} from "../svgs/svgs";
+import {
+  loadSidebarLayout,
+  saveSidebarLayout,
+} from "../storage/layoutRepository";
 
 const MIN_WIDTH = 288; // w-72
 const MAX_WIDTH_RATIO = 0.3; // 50% screen
 
 const Sidebar: React.FC = () => {
+  const [isReady, setIsReady] = useState(false);
   const collections = useCollections();
   const doc = useDoc();
 
-  // Sidebar width state (smooth & internal)
   const [width, setWidth] = useState(MIN_WIDTH);
+
+  // hydrate width on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { width: storedWidth } = await loadSidebarLayout();
+      if (cancelled) return;
+
+      const clamped = Math.min(
+        Math.max(MIN_WIDTH, storedWidth),
+        window.innerWidth * MAX_WIDTH_RATIO
+      );
+
+      setWidth(clamped);
+      setIsReady(true); // sidebar can render now
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // persist width when it changes (debounced)
+  useEffect(() => {
+    if (!isReady) return; // avoid writing initial default
+    const id = setTimeout(() => {
+      void saveSidebarLayout({ width });
+    }, 200);
+    return () => clearTimeout(id);
+  }, [width, isReady]);
 
   // --- Resize Handler ---
   const startResize = (e: React.MouseEvent) => {
@@ -50,7 +89,7 @@ const Sidebar: React.FC = () => {
   );
 
   const toggleCollection = (name: string) =>
-    setOpenMap(prev => ({ ...prev, [name]: !prev[name] }));
+    setOpenMap((prev) => ({ ...prev, [name]: !prev[name] }));
 
   const expandAll = () =>
     setOpenMap(() =>
@@ -68,6 +107,10 @@ const Sidebar: React.FC = () => {
       }, {} as Record<string, boolean>)
     );
 
+  if (!isReady) {
+    return null; // or a skeleton that uses the same final width logic
+  }
+
   return (
     <div
       className="h-full border-r border-surface-500/30 bg-transparent flex flex-col relative"
@@ -83,16 +126,24 @@ const Sidebar: React.FC = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-surface-700 px-4 pb-1 pt-2 mb-2">
         <div className="flex items-center gap-2 w-full">
-          <button className="tracking-wider flex-1 text-left font-medium text-[0.9rem] 
-                             text-surface-200 truncate hover:text-accent-500">
+          <button
+            className="tracking-wider flex-1 text-left font-medium text-[0.9rem] 
+                             text-surface-200 truncate hover:text-accent-500"
+          >
             {doc ? doc.name : "Application Name"}
           </button>
 
-          <button onClick={expandAll} className="text-surface-200 hover:text-white p-1">
+          <button
+            onClick={expandAll}
+            className="text-surface-200 hover:text-white p-1"
+          >
             <ExpandAll />
           </button>
 
-          <button onClick={collapseAll} className="text-surface-200 hover:text-white p-1">
+          <button
+            onClick={collapseAll}
+            className="text-surface-200 hover:text-white p-1"
+          >
             <CollapseAll />
           </button>
         </div>
@@ -114,11 +165,17 @@ const Sidebar: React.FC = () => {
                            focus:outline-none"
               >
                 {isOpen ? (
-                  <span className="h-4 w-4 text-surface-200"><FolderOpenIcon /></span>
+                  <span className="h-4 w-4 text-surface-200">
+                    <FolderOpenIcon />
+                  </span>
                 ) : (
-                  <span className="h-4 w-4 text-surface-200/80"><FolderIcon /></span>
+                  <span className="h-4 w-4 text-surface-200/80">
+                    <FolderIcon />
+                  </span>
                 )}
-                <span className="truncate text-[0.8rem]">{collection.name}</span>
+                <span className="truncate text-[0.8rem]">
+                  {collection.name}
+                </span>
               </button>
 
               {/* Animated list */}
