@@ -39,10 +39,9 @@ const UtilityHeader: React.FC<UtilityHeaderProps> = ({
               e.stopPropagation();
               onclose && onclose();
             }}
-            className="h-6 w-6 inline-flex items-center justify-center rounded-md border 
-                               border-surface-500/30 hover:border-rose-500/10 hover:bg-rose-500/20 cursor-pointer"
+            className="h-6 w-6 inline-flex items-center justify-center rounded-md border border-surface-500/30 hover:border-rose-500/10 hover:bg-rose-500/20 cursor-pointer"
           >
-            <span className="text-surface-300 hover:text-rose-400">
+            <span className="text-surface-300 hover:text-rose-400 h-full w-full flex justify-center items-center">
               <XMarkIcon />
             </span>
           </button>
