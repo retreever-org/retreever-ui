@@ -1,4 +1,3 @@
-// hooks/useAppInitializer.ts
 import { useEffect } from 'react'
 import { useApiHealthStore } from '../stores/api-state-store'
 import { useDocStore } from '../stores/doc-store'
@@ -13,69 +12,69 @@ export const useAppInitializer = () => {
   const docStore = useDocStore()
 
   useEffect(() => {
-    // Run only ONCE on mount
-    let aborted = false
-
+    let cancelled = false
     const controller = new AbortController()
-    
+
     const initialize = async () => {
       docStore.setInitializing(true)
 
       try {
         const cachedDoc = await docStorage.getDoc()
         
-        if (cachedDoc && !aborted) {
+        if (cancelled) return
+        
+        if (cachedDoc) {
           docStore.setDoc(cachedDoc)
           docStore.setCollections(getSidebarCollections(cachedDoc))
           
-          // Background validation
+          // Background validation (fire-and-forget)
           validateDocCache(cachedDoc, controller.signal).catch(console.error)
-        } else if (!aborted) {
+        } else {
           const doc = await getRetreeverDoc()
+          if (cancelled) return
+          
           await docStorage.saveDoc(doc)
           docStore.setDoc(doc)
           docStore.setCollections(getSidebarCollections(doc))
-          console.log("setting online!");
           setOnline()
         }
       } catch (error) {
-        if (aborted) return
+        if (cancelled) return
         
         console.error('App initialization failed:', error)
         const cachedDoc = await docStorage.getDoc()
         if (cachedDoc) {
           docStore.setDoc(cachedDoc)
           docStore.setCollections(getSidebarCollections(cachedDoc))
-          console.log("setting online!");
           setOnline()
         } else {
           setOffline()
         }
       } finally {
-        if (!aborted) {
-          docStore.setInitializing(false)
-        }
+        docStore.setInitializing(false)
       }
     }
 
     initialize()
 
     return () => {
-      aborted = true
+      cancelled = true
       controller.abort()
     }
-  }, []) // EMPTY deps = runs ONCE
+  }, [])
 }
 
-export const validateDocCache = async (cachedDoc: RetreeverDoc | null, signal: AbortSignal) => {
+export const validateDocCache = async (cachedDoc: RetreeverDoc, signal: AbortSignal) => {
   try {
     const pingResponse = await ping()
     if (signal.aborted) return
     
     useApiHealthStore.getState().setOnline()
     
-    if (cachedDoc?.up_time !== pingResponse.uptime) {
+    if (cachedDoc.up_time !== pingResponse.uptime) {
       const freshDoc = await getRetreeverDoc()
+      if (signal.aborted) return
+      
       await docStorage.saveDoc(freshDoc)
       useDocStore.getState().setDoc(freshDoc)
       useDocStore.getState().setCollections(getSidebarCollections(freshDoc))

@@ -5,14 +5,9 @@ import type { TabDoc, KeyOrderMap } from "../types/editor.types";
 interface ViewingDocState {
   endpoint: Endpoint | null;
   tabDoc: TabDoc | null;
-
-  // order map: key -> index (0-based)
   keyOrderMap: KeyOrderMap;
-
-  // the order/index of the currently viewing tab (nullable)
   currentTabOrder: number | null;
 
-  // ---- Actions ----
   setKeyOrderMap: (map: KeyOrderMap) => void;
   setEndpoint: (ep: Endpoint | null) => void;
   setTabDoc: (tab: TabDoc | null) => void;
@@ -25,16 +20,15 @@ interface ViewingDocState {
   clear: () => void;
 }
 
-export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
+// THIS is the store object
+export const viewingDocStore = create<ViewingDocState>((set, get) => ({
   endpoint: null,
   tabDoc: null,
   keyOrderMap: {},
   currentTabOrder: null,
-
+  // ...rest exactly as you already have...
   setKeyOrderMap: (map) => set({ keyOrderMap: map }),
-
   setEndpoint: (endpoint) => set({ endpoint }),
-
   setTabDoc: (tab) =>
     set({
       tabDoc: tab,
@@ -43,9 +37,7 @@ export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
           ? get().keyOrderMap[tab.key]
           : get().currentTabOrder,
     }),
-
   setTabOrder: (order) => set({ currentTabOrder: order }),
-
   updateTabDoc: (patch) => {
     const current = get().tabDoc;
     if (!current) return;
@@ -57,7 +49,6 @@ export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
       },
     });
   },
-
   updateUiRequest: (patch) => {
     const current = get().tabDoc;
     if (!current) return;
@@ -72,7 +63,6 @@ export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
       },
     });
   },
-
   setLastResponse: (resp) => {
     const current = get().tabDoc;
     if (!current) return;
@@ -84,7 +74,6 @@ export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
       },
     });
   },
-
   clear: () =>
     set({
       endpoint: null,
@@ -94,8 +83,12 @@ export const useViewingDocStore = create<ViewingDocState>((set, get) => ({
     }),
 }));
 
+// Hook used in components (what you already had)
+export const useViewingDocStore = viewingDocStore;
+
 // selectors
 export const useViewingEndpoint = () => useViewingDocStore((s) => s.endpoint);
 export const useViewingTabDoc = () => useViewingDocStore((s) => s.tabDoc);
 export const useKeyOrderMap = () => useViewingDocStore((s) => s.keyOrderMap);
-export const useCurrentTabOrder = () => useViewingDocStore((s) => s.currentTabOrder);
+export const useCurrentTabOrder = () =>
+  useViewingDocStore((s) => s.currentTabOrder);

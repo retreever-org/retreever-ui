@@ -22,6 +22,7 @@ export const EndpointList: React.FC<EndpointListProps> = ({
     const ep = findEndpoint(doc, method as any, path)
     if (ep) {
       setViewingEndpoint(ep)
+      useViewingDocStore.getState().setEndpoint(ep);
     }
   }
 

@@ -1,49 +1,63 @@
-import { getTabDoc, saveTabDoc } from "../storage/tab-doc-storage";
-import { appendKeyToOrder } from "../storage/tab-doc-storage";
+import {
+  getTabDoc,
+  saveTabDoc,
+  appendKeyToOrder,
+} from "../storage/tab-doc-storage";
 import { useViewingDocStore } from "../stores/viewing-doc-store";
 import { buildTabDocFromEndpoint, tabKeyForEndpoint } from "./tab-factory";
+import type { Endpoint } from "../types/response.types";
+import type { TabDoc } from "../types/editor.types";
 
-let initialized = false;
+let lastEndpointKey: string | null = null;
 
-/**
- * Called once on app startup to wire the autosave of the current tabDoc.
- */
-export function initViewingDocSync() {
-  if (initialized) return;
-  initialized = true;
+// ---- single subscriber ----
 
-  useViewingDocStore.subscribe((state) => {
-    if (state.tabDoc) saveTabDoc(state.tabDoc);
-  });
+useViewingDocStore.subscribe(async (state) => {
+  const { endpoint, tabDoc } = state;
+
+  persistTabDoc(tabDoc);
+  await syncEndpointToTab(endpoint, tabDoc);
+});
+
+// ---- helpers ----
+
+function persistTabDoc(tabDoc: TabDoc | null) {
+  if (!tabDoc) return;
+  saveTabDoc(tabDoc);
 }
 
-/**
- * Called once on app startup to sync endpoint -> tabDoc.
- */
-export function initViewingEndpointSync() {
-  useViewingDocStore.subscribe(async (state) => {
-    const ep = state.endpoint;
+async function syncEndpointToTab(
+  endpoint: Endpoint | null,
+  currentTab: TabDoc | null
+) {
+  if (!endpoint) {
+    lastEndpointKey = null;
+    return;
+  }
 
-    if (!ep) {
-      useViewingDocStore.setState({ tabDoc: null });
-      return;
-    }
+  const key = tabKeyForEndpoint(endpoint.method, endpoint.path);
 
-    const key = tabKeyForEndpoint(ep.method, ep.path);
-    const existing = await getTabDoc(key);
+  // endpoint effectively unchanged
+  if (lastEndpointKey === key) return;
+  lastEndpointKey = key;
 
-    if (existing) {
-      useViewingDocStore.setState({ tabDoc: existing });
-      return;
-    }
+  // already viewing correct tab
+  if (currentTab && currentTab.key === key) return;
 
-    // create new TabDoc (order is managed separately)
-    const newTab = buildTabDocFromEndpoint(ep);
+  const existing = await getTabDoc(key);
+  if (existing) {
+    useViewingDocStore.setState({ tabDoc: existing });
+    return;
+  }
 
-    // persist doc and append key to order map
-    saveTabDoc(newTab);
-    await appendKeyToOrder(newTab.key);
+  const newTab = buildTabDocFromEndpoint(endpoint);
 
-    useViewingDocStore.setState({ tabDoc: newTab });
-  });
+  saveTabDoc(newTab);
+  await appendKeyToOrder(newTab.key);
+
+  // ensure endpoint still same after async work
+  const latest = useViewingDocStore.getState().endpoint;
+  if (!latest || tabKeyForEndpoint(latest.method, latest.path) !== key) return;
+
+  useViewingDocStore.setState({ tabDoc: newTab });
 }

@@ -8,15 +8,20 @@ import { FloatingDock } from "./layouts/FloatingDock";
 import UtilityBar from "./layouts/UtilityBar";
 import { RightDisplayPanel } from "./components/utility/RightDisplayPanel";
 import { useEnvInitializer } from "./hooks/useEnvInitializer";
-import "./services/auto-refresh-service";
+import "./services/auto-refresh-service"; // auto triggers zustand subscriber
 import { initLayoutPersistence } from "./services/layout-persistence-service";
+import "./services/viewing-doc-sync-service"; // auto triggers zustand subscriber
+import { useEffect } from "react";
 
 function App() {
   const isInitializing = useIsInitializing();
   useAppInitializer();
   useApiHealthMonitor();
   useEnvInitializer();
-  initLayoutPersistence();
+
+  useEffect(() => {
+    initLayoutPersistence();
+  }, []);
 
   if (isInitializing) {
     return (
@@ -42,7 +47,7 @@ function App() {
         <RightDisplayPanel />
       </div>
 
-      <FloatingDock/>
+      <FloatingDock />
     </div>
   );
 }
