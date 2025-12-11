@@ -7,12 +7,16 @@ import DocumentDisplay from "./DocumentDisplay";
 import { useUtilityViewState } from "../stores/utility-view-store";
 import { useDockStore } from "../stores/dock-store";
 
-export type UtilityItem = "Documentation" | "Environment Variables" | "Shortcuts";
+export type UtilityItem =
+  | "Documentation"
+  | "Environment Variables"
+  | "Shortcuts";
 
 const UtilityBar: React.FC = () => {
   const { closePanel, openPanel } = useRightPanelStore();
   const { openDock, closeDock } = useDockStore();
-  const { viewMode, title, setTitle, setContent, clearView } = useUtilityViewState();
+  const { viewMode, title, setTitle, setContent, clearView } =
+    useUtilityViewState();
 
   const viewInSidePanel = useCallback(
     (element: React.ReactNode, newPanelName: UtilityItem) => {
@@ -76,6 +80,13 @@ const UtilityBar: React.FC = () => {
         handleSelect(<EnvironmentVars />, "Environment Variables");
         return;
       }
+
+      // Alt + Shift + D
+      if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        handleSelect(<DocumentDisplay />, "Documentation");
+        return;
+      }
     };
 
     window.addEventListener("keydown", handler);
@@ -93,7 +104,9 @@ const UtilityBar: React.FC = () => {
       />
       <Button
         icon={<VariableIcon />}
-        onClick={() => handleSelect(<EnvironmentVars />, "Environment Variables")}
+        onClick={() =>
+          handleSelect(<EnvironmentVars />, "Environment Variables")
+        }
       />
       <Button
         icon={<ShortcutIcon />}

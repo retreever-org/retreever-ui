@@ -11,7 +11,6 @@ interface DockState {
 
   openDock: () => void;
   closeDock: () => void;
-  toggleDock: () => void;
 
   setPosition: (x: number, y: number) => void;
   setSize: (width: number, height: number) => void;
@@ -41,18 +40,6 @@ export const useDockStore = create<DockState>((set) => ({
     }),
 
   closeDock: () => set({ open: false }),
-
-  toggleDock: () =>
-    set((s) => {
-      // If opening and not moved → center once
-      if (!s.open && !s.hasMoved) {
-        const x = (window.innerWidth - s.width) / 2;
-        const y = (window.innerHeight - s.height) / 2;
-
-        return { open: true, x, y };
-      }
-      return { open: !s.open };
-    }),
 
   setPosition: (x, y) =>
     set({

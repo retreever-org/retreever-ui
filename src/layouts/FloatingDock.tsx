@@ -20,13 +20,12 @@ export function FloatingDock() {
     setPosition,
     setSize,
     closeDock,
-    toggleDock,
   } = useDockStore();
 
   const [visible, setVisible] = useState(open);
   const [docked, setDocked] = useState(false);
 
-  const { viewMode, title, content, clearView, attach } = useUtilityViewState();
+  const { title, content, clearView, attach } = useUtilityViewState();
   const { openPanel } = useRightPanelStore();
 
   const HEADER_HEIGHT = 36;
@@ -36,20 +35,6 @@ export function FloatingDock() {
     if (open) setVisible(true);
     else setTimeout(() => setVisible(false), 120);
   }, [open]);
-
-  // keyboard shortcut
-  useEffect(() => {
-    if (viewMode === "detached") {
-      const handler = (e: KeyboardEvent) => {
-        if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
-          e.preventDefault();
-          toggleDock();
-        }
-      };
-      window.addEventListener("keydown", handler);
-      return () => window.removeEventListener("keydown", handler);
-    }
-  }, [toggleDock]);
 
   if (!visible) return null;
 
