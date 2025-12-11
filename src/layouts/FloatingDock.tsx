@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SidePanelIcon, XMarkIcon } from "../svgs/svgs";
 import { useUtilityViewState } from "../stores/utility-view-store";
 import { useRightPanelStore } from "../stores/right-panel-store";
+import UtilityHeader from "../components/utility/UtilityHeader";
 
 export interface FloatingDockProps {
   title: string;
@@ -27,7 +28,7 @@ export function FloatingDock() {
   const [docked, setDocked] = useState(false);
 
   const { viewMode, title, content, clearView, attach } = useUtilityViewState();
-  const {openPanel} = useRightPanelStore();
+  const { openPanel } = useRightPanelStore();
 
   const HEADER_HEIGHT = 36;
 
@@ -119,47 +120,22 @@ export function FloatingDock() {
           transition: "height 180ms ease-out",
         }}
       >
-        {/* Header */}
-        <div className="dock-header flex items-center justify-between px-3 py-1.5 border-b border-surface-500/30 cursor-grab select-none">
-          <span className="flex items-center gap-2 text-xs font-medium text-slate-200/80">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-            {title}
-          </span>
-
-          <div className="space-x-2 flex justify-center items-center">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                closeDock();
-                attach();
-                openPanel();
-              }}
-              className="h-6 w-6 inline-flex items-center justify-center rounded-md cursor-pointer"
-            >
-              <span className="text-surface-300 hover:text-surface-200 scale-95">
-                <SidePanelIcon/>
-              </span>
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                closeDock();
-                clearView();
-              }}
-              className="h-6 w-6 inline-flex items-center justify-center rounded-md border 
-                       border-surface-500/30 hover:border-rose-500/10 hover:bg-rose-500/20 cursor-pointer"
-            >
-              <span className="text-surface-300 hover:text-rose-400">
-                <XMarkIcon />
-              </span>
-            </button>
-          </div>
-        </div>
+        <UtilityHeader
+          title={title}
+          onSwitchView={() => {
+            closeDock();
+            attach();
+            openPanel();
+          }}
+          onclose={() => {
+            closeDock();
+            clearView();
+          }}
+        />
 
         {/* Body (hidden when docked) */}
         {!docked && (
-          <div className="flex-1 overflow-auto scroll-thin p-4">{content}</div>
+          <div className="flex-1 overflow-auto scroll-thin">{content}</div>
         )}
       </div>
     </Rnd>

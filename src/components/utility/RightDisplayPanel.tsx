@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRightPanelStore } from "../../stores/right-panel-store";
-import { DetachIcon, LeftDoubleIcon } from "../../svgs/svgs";
+import { LeftDoubleIcon } from "../../svgs/svgs";
 import { useUtilityViewState } from "../../stores/utility-view-store";
 import { useDockStore } from "../../stores/dock-store";
 import UtilityHeader from "./UtilityHeader";
@@ -67,19 +67,7 @@ export function RightDisplayPanel() {
         transition: "transform 0.2s ease-out",
       }}
     >
-      <div className="overflow-auto scroll-thin h-full">
-        {/* <div className="flex justify-end px-4 py-2 ">
-          <button
-            className="cursor-pointer text-surface-300 hover:text-surface-200"
-            onClick={() => {
-              detach();
-              closePanel();
-              openDock();
-            }}
-          >
-            <DetachIcon />
-          </button>
-        </div> */}
+      <div className="h-full">
         <UtilityHeader
           title={title}
           onSwitchView={() => {
@@ -90,16 +78,18 @@ export function RightDisplayPanel() {
         />
         <div
           className="
-          h-full flex
+          h-full flex 
+          overflow-auto scroll-thin
         "
         >
           {/* CONTENT */}
-          <div className="flex-1">{content}</div>
+          <div className="flex-1 overflow-auto scroll-thin h-full">{content}</div>
 
           {/* LEFT RESIZE HANDLE */}
           <div
             className="
           absolute left-0 top-0 h-full 
+          overflow-auto scroll-thin
           flex justify-center items-center
           w-2.5 
           cursor-ew-resize 
