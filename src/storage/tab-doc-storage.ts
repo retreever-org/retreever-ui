@@ -46,13 +46,22 @@ export async function removeTabDoc(key: string): Promise<void> {
   await tabsStore.removeItem(key);
 }
 
-export async function clearAllTabDocs(): Promise<void> {
-  const keys = await tabsStore.keys();
-  const tabKeys = keys.filter(
-    (k) => typeof k === "string" && (k as string).startsWith(TAB_PREFIX)
-  ) as string[];
+export async function clearOtherTabs(key: string): Promise<void> {
+  const item = await getTabDoc(key);
+  clearAllTabDocs();
+  if(item) {
+    saveTabDoc(item);
+  }
+}
 
-  await Promise.all(tabKeys.map((k) => tabsStore.removeItem(k)));
+export async function clearAllTabDocs(): Promise<void> {
+  tabsStore.clear();
+  // const keys = await tabsStore.keys();
+  // const tabKeys = keys.filter(
+  //   (k) => typeof k === "string" && (k as string).startsWith(TAB_PREFIX)
+  // ) as string[];
+
+  // await Promise.all(tabKeys.map((k) => tabsStore.removeItem(k)));
 }
 
 // --------- Lifecycle helpers ----------

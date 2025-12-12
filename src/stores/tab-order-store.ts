@@ -9,8 +9,8 @@ interface TabOrderState {
   setActiveTab: (key: string | null, name: string) => void;
 
   closeTab: (tabKey: string) => void;
-  clearAllExcludeActive: () => void;
-  clearAllTabs: () => void;
+  closeOthers: (tabKey: string) => void;
+  closeAll: () => void;
 }
 
 /* ---------- helpers ---------- */
@@ -85,24 +85,24 @@ export const tabOrderStore = create<TabOrderState>((set, get) => ({
     set({ orderList: normList });
   },
 
-  clearAllExcludeActive: () => {
-    const { orderList, activeTab } = get();
-    const item = getByKey(activeTab, orderList);
+  closeOthers: (tabKey: string) => {
+    const { orderList } = get();
+    const item = getByKey(tabKey, orderList);
 
     if (item) {
       set({
         orderList: [item],
-        activeTab,
+        activeTab: tabKey,
       });
     } else {
       set({
         orderList: [],
-        activeTab,
+        activeTab: tabKey,
       });
     }
   },
 
-  clearAllTabs: () => {
+  closeAll: () => {
     set({
       orderList: [],
       activeTab: null,

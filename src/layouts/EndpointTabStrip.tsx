@@ -1,58 +1,74 @@
-import { useEffect, useRef } from "react";
+// File: src/components/EndpointTabStrip.tsx
+import React, { useEffect, useRef, useState } from "react";
 import { viewingDocStore } from "../stores/viewing-doc-store";
 import { useTabOrderStore } from "../stores/tab-order-store";
 import { XMarkIcon } from "../svgs/svgs";
 import { tabKeyToEndpoint } from "../services/tab-factory";
 import { useDocStore } from "../stores/doc-store";
-import { removeTabDoc } from "../storage/tab-doc-storage";
+import { clearAllTabDocs, clearOtherTabs, removeTabDoc } from "../storage/tab-doc-storage";
+import {
+  extractMethod,
+  getMethodColor,
+  sortTabs,
+  calculateMenuPosition,
+} from "../components/canvas/EndpointTabUtil";
 
-export const EndpointTabStrip = () => {
-  const { activeTab, orderList, closeTab, setActiveTab } = useTabOrderStore();
+export const EndpointTabStrip: React.FC = () => {
+  const { activeTab, orderList, closeTab, setActiveTab, closeOthers, closeAll } = useTabOrderStore();
   const { doc } = useDocStore();
+
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Context menu state
+  const [ctx, setCtx] = useState<{
+    visible: boolean;
+    left: number;
+    top: number;
+    tabKey: string | null;
+  }>({ visible: false, left: 0, top: 0, tabKey: null });
+
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // -------------------------------- Click Handlers -------------------------------------
 
   const handleSelect = (tabKey: string) => {
     const state = viewingDocStore.getState();
     const tabDoc = state.tabDoc;
-
     if (tabDoc && tabDoc.key === tabKey) return;
-
     const endpoint = tabKeyToEndpoint(tabKey, doc);
-    if (endpoint) {
-      setActiveTab(tabKey, endpoint.name);
-    }
+    if (endpoint) setActiveTab(tabKey, endpoint.name);
   };
 
   const handleCloseTab = (tabKey: string) => {
     closeTab(tabKey);
-    // removing the tab-doc directly from storage
-    removeTabDoc(tabKey);
+    removeTabDoc(tabKey); // removes from DB directly
   };
 
-  const extractMethod = (tabKey: string): string => {
-    return tabKey.split(":")[0] as string;
-  };
+  const closeCTxMenu = () => setCtx({ ...ctx, visible: false });
 
-  const getMethodColor = (method: string): string => {
-    switch (method) {
-      case "GET":
-        return "text-emerald-400/90";
-      case "POST":
-        return "text-amber-300/90";
-      case "PUT":
-        return "text-primary-300";
-      case "DELETE":
-        return "text-rose-300";
-      case "PATCH":
-        return "text-violet-400";
-      default:
-        return "text-surface-300";
+  // default/context handlers — intentionally empty (wired to receive tabKey)
+  const onCtxClose = (tabKey: string | null) => {
+    if (tabKey) handleCloseTab(tabKey);
+    closeCTxMenu();
+  };
+  const onCtxCloseOther = (tabKey: string | null) => {
+    if(tabKey) {
+      closeOthers(tabKey);
+      clearOtherTabs(tabKey); // removes from DB directly
     }
+    closeCTxMenu();
+  };
+  const onCtxCloseAll = () => {
+    closeAll();
+    clearAllTabDocs();
+    closeCTxMenu();
   };
 
-  const sortedTabs = [...(orderList ?? [])].sort((a, b) => a.order - b.order);
+  const sortedTabs = sortTabs(orderList);
 
-  // scroll active tab into view when activeTab/orderList changes
+  // -------------------------------- Side Effects --------------------------------------
+  // scroll active tab into view
   useEffect(() => {
     if (!activeTab) return;
     const container = scrollRef.current;
@@ -69,18 +85,58 @@ export const EndpointTabStrip = () => {
     const offsetLeft = elRect.left - containerRect.left;
     const offsetRight = offsetLeft + elRect.width;
 
-    if (offsetLeft < 0) {
+    if (offsetLeft < 0)
       container.scrollBy({ left: offsetLeft, behavior: "smooth" });
-    } else if (offsetRight > containerRect.width) {
+    else if (offsetRight > containerRect.width)
       container.scrollBy({
         left: offsetRight - containerRect.width,
         behavior: "smooth",
       });
-    }
   }, [activeTab, sortedTabs.length]);
 
+  useEffect(() => {
+    const onWindowClick = (e: MouseEvent) => {
+      if (!ctx.visible) return;
+      if (!menuRef.current) return;
+      if (e.target instanceof Node && !menuRef.current.contains(e.target)) {
+        setCtx({ visible: false, left: 0, top: 0, tabKey: null });
+      }
+    };
+
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape")
+        setCtx({ visible: false, left: 0, top: 0, tabKey: null });
+    };
+
+    window.addEventListener("click", onWindowClick);
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      window.removeEventListener("click", onWindowClick);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [ctx.visible]);
+
+  // ------------------------------ Context Menu --------------------------------------
+
+  const handleContextMenu = (e: React.MouseEvent, tabKey: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const container = containerRef.current ?? scrollRef.current;
+    if (!container) return;
+
+    const target = e.currentTarget as HTMLElement;
+    const pos = calculateMenuPosition(container, target, {
+      menuWidth: 180,
+      gap: 6,
+    });
+
+    setCtx({ visible: true, left: pos.left, top: pos.top, tabKey });
+  };
+
+  // --------------------------------- UI Component ---------------------------------
   return (
-    <div className="w-full bg-transparent relative pr-12">
+    <div className="w-full bg-transparent relative pr-12" ref={containerRef}>
       <div
         ref={scrollRef}
         className="flex items-stretch overflow-x-auto overflow-y-hidden scroll-thin scroll-transparent border-b border-surface-500/30 text-[0.7rem]"
@@ -93,20 +149,18 @@ export const EndpointTabStrip = () => {
             <div
               key={tab.tabKey}
               data-tab-key={tab.tabKey}
-              className={`flex shrink-0 items-center border-b group py-2 cursor-pointer
-                ${isActive ? " border-b-surface-300" : "border-b-transparent"}`}
+              onContextMenu={(e) => handleContextMenu(e, tab.tabKey)}
+              className={`flex shrink-0 items-center border-b group py-2 cursor-pointer ${
+                isActive ? " border-b-surface-300" : "border-b-transparent"
+              }`}
             >
-              <div className="flex justify-center items-center px-1 space-x-1 border-r border-surface-500/30">
-                <div
+              <div className="flex justify-center items-center px-1 space-x-1 border-r border-surface-500/30 cursor-pointer">
+                <button
+                  type="button"
                   onClick={() => handleSelect(tab.tabKey)}
-                  className={`
-                  ml-5 p-1 space-x-1
-                  flex items-center
-                  transition-colors duration-200
-                  min-w-0 flex-1
-                  text-surface-200
-                  ${isActive ? "opacity-100" : "opacity-65 hover:opacity-75"}
-                `}
+                  className={`ml-5 p-1 space-x-1 flex items-center transition-colors duration-200 min-w-0 flex-1 text-surface-200 cursor-pointer ${
+                    isActive ? "opacity-100" : "opacity-65 hover:opacity-75"
+                  }`}
                 >
                   <span
                     className={`font-mono tracking-tighter font-bold shrink-0 w-max ${getMethodColor(
@@ -115,21 +169,20 @@ export const EndpointTabStrip = () => {
                   >
                     {method}
                   </span>
+
                   <span className="relative z-10 truncate max-w-48 block">
                     {tab.name}
                   </span>
-                </div>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => handleCloseTab(tab.tabKey)}
-                  className={`
-                      rounded-r transition-all duration-200 invisible group-hover:visible cursor-pointer
-                      ${
-                        isActive
-                          ? "text-surface-200"
-                          : "text-surface-400 hover:text-surface-200"
-                      }
-                    `}
+                  className={`rounded-r transition-all duration-200 invisible group-hover:visible cursor-pointer ${
+                    isActive
+                      ? "text-surface-200"
+                      : "text-surface-400 hover:text-surface-200"
+                  }`}
                   title="Close tab"
                 >
                   <XMarkIcon />
@@ -139,6 +192,37 @@ export const EndpointTabStrip = () => {
           );
         })}
       </div>
+
+      {/* Context menu card */}
+      {ctx.visible && ctx.tabKey && (
+        <div
+          ref={menuRef}
+          style={{ left: ctx.left, top: ctx.top }}
+          className={`text-xs absolute z-50 bg-surface-700 border border-surface-500/30 rounded-sm shadow-lg`}
+        >
+          <div className="flex flex-col space-y-1 p-2 bg-black/30 min-w-48">
+            <CtxButton onClick={() => onCtxClose(ctx.tabKey)}>Close</CtxButton>
+            <CtxButton onClick={() => onCtxCloseOther(ctx.tabKey)}>
+              Close Other
+            </CtxButton>
+            <CtxButton onClick={() => onCtxCloseAll()}>Close All</CtxButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+// small presentational button to keep markup DRY
+const CtxButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+  children,
+  ...props
+}) => (
+  <button
+    {...props}
+    type="button"
+    className="text-surface-300 hover:text-surface-200  rounded-sm text-left px-2 py-1 transition"
+  >
+    {children}
+  </button>
+);
