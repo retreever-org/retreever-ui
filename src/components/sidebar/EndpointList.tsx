@@ -2,6 +2,7 @@ import React from "react";
 import type { EndpointSummary } from "../../types/filtered.types";
 import { useTabOrderStore } from "../../stores/tab-order-store";
 import { tabKeyForEndpoint } from "../../services/tab-factory";
+import { useCanvasState } from "../../stores/canvas-controller-store";
 
 interface EndpointListProps {
   collectionName: string;
@@ -13,10 +14,12 @@ export const EndpointList: React.FC<EndpointListProps> = ({
   endpoints,
 }) => {
   const { setActiveTab } = useTabOrderStore();
+  const {setDisplayApiDoc} = useCanvasState();
 
   const handleClick = (name: string, method: string, path: string) => {
       const key = tabKeyForEndpoint(method, path);
       setActiveTab(key, name);
+      setDisplayApiDoc(false); // set display doc to false to display selection
   };
 
   return (

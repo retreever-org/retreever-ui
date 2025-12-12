@@ -13,6 +13,7 @@ import {
   loadSidebarLayout,
   saveSidebarLayout,
 } from "../storage/layoutRepository";
+import { useCanvasState } from "../stores/canvas-controller-store";
 
 const MIN_WIDTH = 288; // w-72
 const MAX_WIDTH_RATIO = 0.3; // 50% screen
@@ -24,6 +25,8 @@ const Sidebar: React.FC = () => {
 
   const [width, setWidth] = useState(MIN_WIDTH);
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
+
+  const {displayApiDoc, setDisplayApiDoc} = useCanvasState();
 
   // hydrate width + openMap on mount
   useEffect(() => {
@@ -131,8 +134,10 @@ const Sidebar: React.FC = () => {
       <div className="sticky top-0 z-10 bg-surface-700 px-4 pb-1 pt-2 mb-2">
         <div className="flex items-center gap-2 w-full">
           <button
+            type="button"
             className="tracking-wider flex-1 text-left font-medium text-[0.9rem] 
-                             text-surface-200 truncate hover:text-accent-500"
+                             text-surface-200 truncate hover:text-primary-300"
+            onClick={() => setDisplayApiDoc(!displayApiDoc)}
           >
             {doc ? doc.name : "Application Name"}
           </button>

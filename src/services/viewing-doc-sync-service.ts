@@ -4,8 +4,6 @@ import type { Endpoint } from "../types/response.types";
 import type { TabDoc } from "../types/editor.types";
 import { getTabDoc, saveTabDoc } from "../storage/tab-doc-storage";
 
-let lastEndpointKey: string | null = null;
-
 // ---- single subscriber ----
 
 useViewingDocStore.subscribe(async (state) => {
@@ -27,7 +25,6 @@ async function syncEndpointToTab(
   currentTab: TabDoc | null
 ) {
   if (!endpoint) {
-    lastEndpointKey = null;
     return;
   }
 

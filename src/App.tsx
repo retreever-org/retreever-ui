@@ -8,16 +8,19 @@ import { FloatingDock } from "./layouts/FloatingDock";
 import UtilityBar from "./layouts/UtilityBar";
 import { RightDisplayPanel } from "./components/utility/RightDisplayPanel";
 import { useEnvInitializer } from "./hooks/useEnvInitializer";
-import "./services/auto-refresh-service"; // auto triggers zustand subscriber
+import "./services/auto-refresh-service";
 import { initLayoutPersistence } from "./services/layout-persistence-service";
-import "./services/viewing-doc-sync-service"; // auto triggers zustand subscriber
-import "./services/tab-order-sync-service"; // auto triggers zustand subscriber
-import { useEffect } from "react";
+import "./services/viewing-doc-sync-service";
+import "./services/tab-order-sync-service";
+import { useEffect, useState } from "react";
 import { useTabOrderInitializer } from "./hooks/useTabOrderInitializer";
 import { useViewingDocInitializer } from "./hooks/useViewingDocInitializer";
+import Loading from "./components/canvas/Loading";
 
 function App() {
   const isInitializing = useIsInitializing();
+  const [ready, setReady] = useState(false);
+
   useAppInitializer();
   useApiHealthMonitor();
   useEnvInitializer();
@@ -28,12 +31,15 @@ function App() {
     initLayoutPersistence();
   }, []);
 
-  if (isInitializing) {
-    return (
-      <div className="h-screen w-screen bg-surface-800 text-surface-300 flex items-center justify-center">
-        <div>Loading Retreever...</div>
-      </div>
-    );
+  useEffect(() => {
+    if (!isInitializing) {
+      const t = setTimeout(() => setReady(true), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [isInitializing]);
+
+  if (isInitializing || !ready) {
+    return <Loading />;
   }
 
   return (
@@ -43,11 +49,10 @@ function App() {
       <div className="flex h-[calc(100vh-3rem)] w-full relative">
         <Sidebar />
 
-        <main className="flex-1 overflow-hidden bg-black/10">
+        <main className="flex-1 overflow-hidden bg-black/15">
           <Canvas />
         </main>
 
-        {/* RIGHT-SIDE STACKED COMPONENTS */}
         <UtilityBar />
         <RightDisplayPanel />
       </div>
