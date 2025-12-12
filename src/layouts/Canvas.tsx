@@ -3,6 +3,7 @@ import { useCanvasState } from "../stores/canvas-controller-store";
 import { useTabOrderList } from "../stores/tab-order-store";
 import { XMarkIcon } from "../svgs/svgs";
 import { EndpointTabStrip } from "./EndpointTabStrip";
+import TestingPanel from "./TestingPanel";
 
 const Canvas: React.FC = () => {
   const { displayApiDoc, setDisplayApiDoc } = useCanvasState();
@@ -29,6 +30,7 @@ const Canvas: React.FC = () => {
   return (
     <div className="border-b h-full static overflow-hidden bg-transparent text-surface-200 text-sm pr-12">
       <EndpointTabStrip />
+      <TestingPanel />
     </div>
   );
 };

@@ -131,7 +131,7 @@ const Sidebar: React.FC = () => {
       />
 
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-surface-700 px-4 pb-1 pt-2 mb-2">
+      <div className="sticky h-10 top-0 z-10 bg-surface-700 px-4 py-2 mb-2 border-b border-surface-500/30">
         <div className="flex items-center gap-2 w-full">
           <button
             type="button"

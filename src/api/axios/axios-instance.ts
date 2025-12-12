@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from "axios";
 
-const getBaseURL = (): string => {
+export const getBaseURL = (): string => {
 
   // Priority 1: .env VITE_BASE_URL
   if (import.meta.env.VITE_BASE_URL) {

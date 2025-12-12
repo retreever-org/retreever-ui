@@ -139,7 +139,7 @@ export const EndpointTabStrip: React.FC = () => {
     <div className="w-full bg-transparent relative" ref={containerRef}>
       <div
         ref={scrollRef}
-        className="flex items-stretch overflow-x-auto overflow-y-hidden scroll-thin scroll-transparent border-b border-surface-500/30 text-[0.7rem]"
+        className="flex h-10 items-stretch overflow-x-auto overflow-y-hidden scroll-thin scroll-transparent border-b border-surface-500/30 text-[0.7rem]"
       >
         {sortedTabs.map((tab) => {
           const isActive = activeTab === tab.tabKey;
