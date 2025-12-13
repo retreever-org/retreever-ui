@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useEnvVarsStore } from "../../stores/env-vars-store";
-import { FlameIcon, SparkIcon } from "../../svgs/svgs";
+import { FlameIcon } from "../../svgs/svgs";
 
 interface EnvVarOverlayProps {
   anchorRect: DOMRect;
