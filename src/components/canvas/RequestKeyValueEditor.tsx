@@ -35,16 +35,37 @@ const RequestKeyValueEditor: React.FC = () => {
   const { tabDoc, updateUiRequest } = useViewingDocStore();
   if (!tabDoc) return null;
 
-  const { editing } = tabDoc.uiRequest;
-  if (editing !== "headers" && editing !== "params") return null;
+  const { editing, bodyType, body } = tabDoc.uiRequest;
+  if (editing !== "headers" && editing !== "params" && tabDoc.uiRequest.bodyType !== "x-www-form-urlencoded") return null;
 
-  const sourceKey = editing === "headers" ? "headers" : "queryParams";
-  const rows = ensureTrailingEmpty(tabDoc.uiRequest[sourceKey]);
+  let sourceKey: "headers" | "queryParams" | "body.urlEncoded" | null = null;
+
+  if (editing === "headers") sourceKey = "headers";
+  else if (editing === "params") sourceKey = "queryParams";
+  else if (editing === "body" && bodyType === "x-www-form-urlencoded") {
+    sourceKey = "body.urlEncoded";
+  }
+
+  if (!sourceKey) return null;
+
+  const rows =
+    sourceKey === "body.urlEncoded"
+      ? ensureTrailingEmpty(body.urlEncoded)
+      : ensureTrailingEmpty(tabDoc.uiRequest[sourceKey]);
 
   const updateRows = (next: RequestKeyValueEntry[]) => {
-    updateUiRequest({
-      [sourceKey]: ensureTrailingEmpty(next),
-    });
+    if (sourceKey === "body.urlEncoded") {
+      updateUiRequest({
+        body: {
+          ...body,
+          urlEncoded: ensureTrailingEmpty(next),
+        },
+      });
+    } else {
+      updateUiRequest({
+        [sourceKey]: ensureTrailingEmpty(next),
+      });
+    }
   };
 
   const updateRow = (index: number, patch: Partial<RequestKeyValueEntry>) => {

@@ -7,7 +7,6 @@ import RequestKeyValueEditor from "../components/canvas/RequestKeyValueEditor";
 
 const TestingPanel: React.FC = () => {
   const { endpoint, tabDoc } = useViewingDocStore();
-  const { editing } = tabDoc?.uiRequest || {};
 
   if (!endpoint || !tabDoc) {
     return <div className="p-4 text-sm text-red-500">Invalid Endpoint</div>;
@@ -48,13 +47,11 @@ const TestingPanel: React.FC = () => {
 
       {/* View switches */}
       <RequestInputController />
-      {
-        (editing === "headers" || editing === "params") && (
-          <div className="flex-1 overflow-auto">
-            <RequestKeyValueEditor />
-          </div>
-        )
-      }
+
+      {/* Key-Value Editor - renders only for headers, params, and form-urlencoded body */}
+      <div className="flex-1 overflow-auto">
+        <RequestKeyValueEditor />
+      </div>
     </section>
   );
 };
