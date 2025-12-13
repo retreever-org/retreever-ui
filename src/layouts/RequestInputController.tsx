@@ -43,18 +43,16 @@ const RequestInputController: React.FC = () => {
               key={opt.key}
               name={opt.label}
               active={active}
-              onClick={() =>
-                updateUiRequest({ editing: opt.key })
-              }
+              onClick={() => updateUiRequest({ editing: opt.key })}
             />
           );
         })}
       </div>
 
       {/* Body / Consumes */}
-      {hasConsumes ? (
-        <ConsumesOption />
-      ) : (
+      {hasConsumes && <ConsumesOption />}
+
+      {!hasConsumes && editing === "body" && (
         <div className="flex items-center gap-4 mr-3">
           <BodySelector
             value={bodyType}
@@ -108,10 +106,7 @@ interface BodySelectorProps {
   onChange: (v: BodyType) => void;
 }
 
-const BodySelector: React.FC<BodySelectorProps> = ({
-  value,
-  onChange,
-}) => {
+const BodySelector: React.FC<BodySelectorProps> = ({ value, onChange }) => {
   const selectedStyles = "text-surface-100 shadow-sm";
   const unselectedStyles = "text-surface-300 hover:text-surface-100";
 
