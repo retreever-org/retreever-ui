@@ -61,17 +61,17 @@ const RequestKeyValueEditor: React.FC = () => {
     <div className="flex-1 overflow-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="text-surface-300 ">
-            <th className="min-w-6 text-center px-1 py-2 border border-surface-500/50 font-medium">
+          <tr className="text-surface-300 bg-black/10">
+            <th className="min-w-6 text-center px-1 py-2 border border-surface-500/40 font-medium">
               {" "}
             </th>
-            <th className="text-left px-4 py-2 border border-surface-500/50 font-medium">
+            <th className="text-left px-4 py-2 border border-surface-500/40 font-medium">
               Name
             </th>
-            <th className="text-left px-4 py-2 border border-r-0 border-surface-500/50 font-medium">
+            <th className="text-left px-4 py-2 border border-r-0 border-surface-500/40 font-medium">
               Value
             </th>
-            <th className="w-5 border border-l-0 border-surface-500/50" />
+            <th className="w-5 border border-l-0 border-surface-500/40" />
           </tr>
         </thead>
 
@@ -88,7 +88,7 @@ const RequestKeyValueEditor: React.FC = () => {
                 }`}
               >
                 {/* IGNORE */}
-                <td className="text-center border border-surface-500/50">
+                <td className="text-center border border-surface-500/40">
                   <label className="inline-flex items-center justify-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -123,7 +123,7 @@ const RequestKeyValueEditor: React.FC = () => {
                 </td>
 
                 {/* NAME */}
-                <td className="px-4 py-2 border border-surface-500/50">
+                <td className="px-4 py-2 border border-surface-500/40">
                   <input
                     type="text"
                     value={row.key + (disabledKey ? " *" : "")}
@@ -141,7 +141,7 @@ const RequestKeyValueEditor: React.FC = () => {
                 </td>
 
                 {/* VALUE */}
-                <td className="px-4 py-2 border border-r-0 border-surface-500/50">
+                <td className="px-4 py-2 border border-r-0 border-surface-500/40">
                   <input
                     type="text"
                     value={row.value}
@@ -154,7 +154,7 @@ const RequestKeyValueEditor: React.FC = () => {
                 </td>
 
                 {/* DELETE */}
-                <td className="px-2 border border-l-0 border-surface-500/50 text-right">
+                <td className="px-2 border border-l-0 border-surface-500/40 text-right">
                   {row.local && !empty && (
                     <button
                       onClick={() => deleteRow(index)}
