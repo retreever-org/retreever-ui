@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useViewingDocStore } from "../../stores/viewing-doc-store";
 import type { FormEntry } from "../../types/editor.types";
 import { CheckIcon2, DeleteIcon } from "../../svgs/svgs";
