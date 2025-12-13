@@ -33,10 +33,6 @@ const FormEditor: React.FC = () => {
   const { tabDoc, updateUiRequest } = useViewingDocStore();
   if (!tabDoc) return null;
 
-  useEffect(() => {
-    console.log(tabDoc.uiRequest.body.formData);
-  }, [tabDoc]);
-
   const { editing, bodyType, body } = tabDoc.uiRequest;
   if (editing !== "body" || bodyType !== "form-data") return null;
 

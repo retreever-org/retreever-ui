@@ -5,6 +5,7 @@ import Request from "../components/canvas/Request";
 import RequestInputController from "./RequestInputController";
 import RequestKeyValueEditor from "../components/canvas/RequestKeyValueEditor";
 import FormEditor from "../components/canvas/FormEditor";
+import CodeEditor from "../components/canvas/CodeEditor";
 
 const TestingPanel: React.FC = () => {
   const { endpoint, tabDoc } = useViewingDocStore();
@@ -54,6 +55,10 @@ const TestingPanel: React.FC = () => {
 
       {/* Form Editor - renders only for body of type form-data */}
       <FormEditor />
+
+      {
+        tabDoc.uiRequest.bodyType === "raw" && tabDoc.uiRequest.editing === "body" && <CodeEditor />
+      }
     </section>
   );
 };
