@@ -30,7 +30,7 @@ const EnvAwareInput: React.FC<EnvAwareInputProps> = ({
 
     return parts.map((part, i) =>
       part.startsWith("{{") && part.endsWith("}}") ? (
-        <span key={i} className="text-rose-300 font-medium">
+        <span key={i} className="text-emerald-300/80 bg-emerald-300/10 tracking-tight rounded-sm font-medium">
           {part}
         </span>
       ) : (

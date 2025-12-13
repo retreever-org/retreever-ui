@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useEnvVarsStore } from "../../stores/env-vars-store";
-import { SparkIcon } from "../../svgs/svgs";
+import { FlameIcon, SparkIcon } from "../../svgs/svgs";
 
 interface EnvVarOverlayProps {
   anchorRect: DOMRect;
@@ -93,7 +93,7 @@ const EnvVarOverlay: React.FC<EnvVarOverlayProps> = ({
           <li
             key={v.name!}
             className={`
-              px-3 py-2 cursor-pointer text-sm
+              px-3 py-2 mx-1 cursor-pointer text-sm rounded-md
               text-surface-200 transition-colors
               ${i === activeIndex ? "bg-surface-800" : "hover:bg-surface-800"}
             `}
@@ -104,8 +104,8 @@ const EnvVarOverlay: React.FC<EnvVarOverlayProps> = ({
             }}
           >
             <div className="flex items-center gap-2">
-              <span className="h-5 w-5 text-primary-300">
-                <SparkIcon />
+              <span className="h-5 w-5 p-0.5 bg-emerald-300/10 rounded-md text-emerald-300/80">
+                <FlameIcon />
               </span>
               <span className="truncate">{v.name}</span>
             </div>
