@@ -1,30 +1,34 @@
 import { useEffect, useRef, useState } from "react";
+import { useViewingDocStore } from "../../stores/viewing-doc-store";
 import type { RawBodyType } from "../../types/editor.types";
 
 /* --------------------------
-   RawDropdown - custom select replacement
-   - Uses the requested classes for the dropdown container:
-     "border border-surface-500/50" and "bg-black/20"
-   - Options are rendered as buttons that call onChange when clicked
+   RawBodyDropdown - tab-scoped (via viewingDocStore)
    -------------------------- */
-interface RawDropdownProps {
-  value: RawBodyType;
-  options: RawBodyType[];
-  onChange: (r: RawBodyType) => void;
-}
 
-const RawBodyDropdown: React.FC<RawDropdownProps> = ({
-  value,
-  options,
-  onChange,
-}) => {
+const RAW_TYPE_TO_CONSUMES: Record<RawBodyType, string> = {
+  JSON: "application/json",
+  XML: "application/xml",
+  HTML: "text/html",
+  JavaScript: "application/javascript",
+  text: "text/plain",
+};
+
+const RawBodyDropdown: React.FC = () => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
+  const { tabDoc, updateUiRequest } = useViewingDocStore();
+
+  const ui = tabDoc?.uiRequest;
+  if (!ui || ui.bodyType !== "raw") return null;
+
+  const value = ui.rawType ?? "JSON";
+  const options: RawBodyType[] = ["text", "JSON", "XML", "HTML", "JavaScript"];
+
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
-      if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -37,10 +41,11 @@ const RawBodyDropdown: React.FC<RawDropdownProps> = ({
     };
   }, []);
 
-  const toggle = (next?: boolean) =>
-    setOpen((s) => (typeof next === "boolean" ? next : !s));
   const onSelect = (r: RawBodyType) => {
-    onChange(r);
+    updateUiRequest({
+      rawType: r,
+      consumes: [RAW_TYPE_TO_CONSUMES[r]],
+    });
     setOpen(false);
   };
 
@@ -48,10 +53,12 @@ const RawBodyDropdown: React.FC<RawDropdownProps> = ({
     <div ref={rootRef} className="relative inline-block text-xs">
       <button
         type="button"
-        onClick={() => toggle()}
+        onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="h-8 px-3 rounded-md flex items-center gap-2 text-surface-100 bg-surface-700 border border-surface-600 outline-none"
+        className="h-8 px-3 rounded-md flex items-center gap-2
+                   text-surface-100 bg-surface-700
+                   border border-surface-600 outline-none"
       >
         <span className="whitespace-nowrap">{value}</span>
         <svg
@@ -72,31 +79,30 @@ const RawBodyDropdown: React.FC<RawDropdownProps> = ({
         </svg>
       </button>
 
-      {/* Dropdown panel */}
       {open && (
         <div
           role="listbox"
           aria-label="Raw body type"
-          className="absolute right-0 mt-2 min-w-[120px] z-50 rounded-md shadow-md border border-surface-500/50 bg-black/20 p-1"
+          className="absolute right-0 mt-2 min-w-[120px] z-50 rounded-md
+                     border border-surface-500/50 bg-black/20 p-1"
         >
-          <div className="flex flex-col gap-1">
-            {options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => onSelect(opt)}
-                className={`w-full text-left px-3 py-2 text-xs rounded-md transition-colors duration-100 ${
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onSelect(opt)}
+              className={`w-full text-left px-3 py-2 rounded-md transition-colors
+                ${
                   opt === value
                     ? "text-surface-100 bg-surface-800"
                     : "text-surface-300 hover:text-surface-100 hover:bg-surface-800/40"
                 }`}
-                aria-checked={opt === value}
-                role="option"
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
+              role="option"
+              aria-checked={opt === value}
+            >
+              {opt}
+            </button>
+          ))}
         </div>
       )}
     </div>

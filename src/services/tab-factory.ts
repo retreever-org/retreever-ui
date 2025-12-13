@@ -1,6 +1,7 @@
 import type { TabDoc } from "../types/editor.types";
 import type { Endpoint, RetreeverDoc } from "../types/response.types";
 import { findEndpoint } from "./doc-search";
+import { resolveContentType } from "../services/contentTypeResolver"; // ✅ ADD
 
 export const tabKeyForEndpoint = (method: string, path: string) =>
   `${method.toUpperCase()}:${path}`;
@@ -13,7 +14,6 @@ export function tabKeyToEndpoint(
   if (!methodPart || !path) return null;
 
   const method = methodPart.toUpperCase();
-
   const endpoint = findEndpoint(doc, method, path);
 
   return endpoint;
@@ -41,6 +41,11 @@ export function buildTabDocFromEndpoint(
     }
   }
 
+  const consumes = ep.consumes || [];
+  const resolved = consumes.length > 0
+    ? resolveContentType(consumes[0])
+    : { bodyType: "none" as const, rawType: undefined };
+
   return {
     key,
     method,
@@ -53,7 +58,11 @@ export function buildTabDocFromEndpoint(
         v: String(q.default_value ?? ""),
       })),
       body,
-      consumes: ep.consumes || [],
+      consumes,
+
+      editing: "params",
+      bodyType: resolved.bodyType,
+      rawType: resolved.rawType,
     },
     lastResponse: undefined,
     createdAt: Date.now(),

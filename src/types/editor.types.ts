@@ -11,6 +11,10 @@ export interface TabDoc {
     queryParams: Array<{ k: string; v: string }>;
     body: string;
     consumes: string[];
+
+    editing: EditingType;
+    bodyType: BodyType;
+    rawType: RawBodyType | undefined;
   };
 
   lastResponse?: {
@@ -27,14 +31,19 @@ export interface TabDoc {
 
 export interface TabOrderItem {
   tabKey: string;
-  order: number;    // 0-based index
-  name: string;     // label for TabBar
+  order: number; // 0-based index
+  name: string; // label for TabBar
 }
 
 export type TabOrderList = TabOrderItem[];
 
 export type EditingType = "params" | "headers" | "body";
 
-export type BodyType = "none" | "form-data" | "x-www-form-urlencoded" | "binary" | "raw";
+export type BodyType =
+  | "none"
+  | "form-data"
+  | "x-www-form-urlencoded"
+  | "binary"
+  | "raw";
 
 export type RawBodyType = "text" | "JSON" | "XML" | "HTML" | "JavaScript";
