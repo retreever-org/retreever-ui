@@ -76,7 +76,7 @@ const EnvVarOverlay: React.FC<EnvVarOverlayProps> = ({
       ref={rootRef}
       className="
         fixed z-9999
-        bg-black/30 backdrop-blur-md
+        bg-black/20 backdrop-blur-md
         border border-surface-500/50
         rounded-lg shadow-lg
         min-w-[260px] max-h-[280px]

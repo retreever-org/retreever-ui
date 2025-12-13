@@ -198,9 +198,9 @@ export const EndpointTabStrip: React.FC = () => {
         <div
           ref={menuRef}
           style={{ left: ctx.left, top: ctx.top }}
-          className={`text-xs absolute z-50 bg-surface-700 border border-surface-500/30 rounded-sm shadow-lg`}
+          className={`text-xs absolute z-50 bg-black/30 backdrop-blur-md border border-surface-500/30 rounded-md shadow-lg`}
         >
-          <div className="flex flex-col space-y-1 p-2 bg-black/30 min-w-48">
+          <div className="flex flex-col space-y-1 py-1 min-w-48">
             <CtxButton onClick={() => onCtxClose(ctx.tabKey)}>Close</CtxButton>
             <CtxButton onClick={() => onCtxCloseOther(ctx.tabKey)}>
               Close Other
@@ -221,7 +221,7 @@ const CtxButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
   <button
     {...props}
     type="button"
-    className="text-surface-300 hover:text-surface-200  rounded-sm text-left px-2 py-1 transition"
+    className="text-surface-300 hover:text-surface-200 mx-0.5 hover:bg-surface-500/10 rounded-sm text-left p-2 transition"
   >
     {children}
   </button>

@@ -69,7 +69,7 @@ const ConsumesOption: React.FC = () => {
       {open && (
         <div
           className="absolute left-0 mt-2 z-50 min-w-[260px] rounded-md p-1
-                     border border-surface-500/50 bg-black/20 backdrop-blur"
+                     border border-surface-500/50 bg-black/20 backdrop-blur-md"
         >
           {consumes.map((ct) => (
             <button
