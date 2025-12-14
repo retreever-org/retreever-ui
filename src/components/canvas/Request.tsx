@@ -6,7 +6,7 @@ const Request: React.FC = () => {
   const { endpoint } = useViewingDocStore();
   const baseUrl = getBaseURL();
   return (
-    <div className="flex justify-center items-center w-full h-12 gap-2">
+    <div data-request-bar className="flex justify-center items-center w-full h-12 gap-2">
       <div className="w-full flex items-center border border-surface-500 rounded-md">
         <div
           className={`text-center w-24 py-1 my-2 text-sm font-semibold uppercase ${getMethodColor(

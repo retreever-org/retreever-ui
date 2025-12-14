@@ -73,7 +73,7 @@ export const EndpointTabStrip: React.FC = () => {
           });
       }
     }
-  }
+  };
 
   const handleCloseTab = async (tabKey: string) => {
     deleteFilesInTabDoc(tabKey);
@@ -92,11 +92,13 @@ export const EndpointTabStrip: React.FC = () => {
   const onCtxCloseOther = (tabKey: string | null) => {
     // delete files in other tabs
     getAllTabDoc().then((all) => {
-      all.filter((td) => td.key !== tabKey).forEach(async (td) => {
-        await deleteFilesInTabDoc(td.key);
-        removeTabDoc(td.key); // removes from DB directly
-      });
-    })
+      all
+        .filter((td) => td.key !== tabKey)
+        .forEach(async (td) => {
+          await deleteFilesInTabDoc(td.key);
+          removeTabDoc(td.key); // removes from DB directly
+        });
+    });
     if (tabKey) {
       closeOthers(tabKey);
       clearOtherTabs(tabKey); // removes from DB directly
@@ -182,7 +184,11 @@ export const EndpointTabStrip: React.FC = () => {
 
   // --------------------------------- UI Component ---------------------------------
   return (
-    <div className="w-full bg-transparent relative" ref={containerRef}>
+    <div
+      data-endpoint-tab-strip
+      className="w-full h-max bg-transparent"
+      ref={containerRef}
+    >
       <div
         ref={scrollRef}
         className="flex h-10 items-stretch overflow-x-auto overflow-y-hidden scroll-thin scroll-transparent border-b border-surface-500/30 text-[0.7rem]"

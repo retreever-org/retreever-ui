@@ -7,7 +7,7 @@ import ConnectionStatus from "../components/navbar/ConnectionStatus";
 
 export const Navbar: React.FC = () => {
   return (
-    <header className="border-b border-surface-500/30 bg-transparent">
+    <header data-navbar className="border-b border-surface-500/30 bg-transparent">
       <div className="mx-auto flex h-12 items-center justify-between px-4 sm:px-6">
         
         {/* Left: Logo + product */}

@@ -1,13 +1,29 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const MIN_HEIGHT = 120;
-const MAX_HEIGHT = 600;
+const MIN_HEIGHT = 48;
 
 const ResponsePanel: React.FC = () => {
   const [height, setHeight] = useState(220);
   const draggingRef = useRef(false);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
+  const maxHeightRef = useRef<number>(window.innerHeight);
+
+  useEffect(() => {
+    const calculateMaxHeight = () => {
+      const requestBar = document.querySelector("[data-request-bar]");
+      if (!requestBar) return;
+
+      const rect = requestBar.getBoundingClientRect();
+      const gap = 8; // breathing space
+      maxHeightRef.current = window.innerHeight - rect.bottom - gap;
+    };
+
+    calculateMaxHeight();
+    window.addEventListener("resize", calculateMaxHeight);
+
+    return () => window.removeEventListener("resize", calculateMaxHeight);
+  }, []);
 
   const onMouseDown = (e: React.MouseEvent) => {
     draggingRef.current = true;
@@ -24,7 +40,7 @@ const ResponsePanel: React.FC = () => {
     const delta = startYRef.current - e.clientY;
     const next = startHeightRef.current + delta;
 
-    setHeight(Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, next)));
+    setHeight(Math.min(maxHeightRef.current, Math.max(MIN_HEIGHT, next)));
   };
 
   const onMouseUp = () => {
@@ -38,7 +54,7 @@ const ResponsePanel: React.FC = () => {
       className="
         absolute
         bottom-0 inset-x-0
-        z-50
+        z-17
         bg-[#1B1B1B]
         border-t border-surface-500/40
         shadow-2xl
