@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { EditorView } from "@codemirror/view";
 import { json } from "@codemirror/lang-json";
@@ -65,10 +65,43 @@ const monoFont = EditorView.theme({
 });
 
 /* ---------------- component ---------------- */
+const MIN_EDITOR_HEIGHT = 220;
 
 const CodeEditor: React.FC = () => {
   const { endpoint, tabDoc, updateUiRequest } = useViewingDocStore();
   if (!tabDoc) return null;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [editorHeight, setEditorHeight] = useState<number>(MIN_EDITOR_HEIGHT);
+
+  useEffect(() => {
+    const calculateHeight = () => {
+      const container = containerRef.current;
+      const responsePanel = document.querySelector("[data-response-panel]");
+
+      if (!container || !responsePanel) return;
+
+      const editorRect = container.getBoundingClientRect();
+      const responseRect = responsePanel.getBoundingClientRect();
+
+      const gap = 8; // breathing space
+      const available = responseRect.top - editorRect.top - gap;
+
+      setEditorHeight(Math.max(MIN_EDITOR_HEIGHT, available));
+    };
+
+    calculateHeight();
+
+    window.addEventListener("resize", calculateHeight);
+
+    // Response panel is draggable → recalc on mouse move
+    document.addEventListener("mousemove", calculateHeight);
+
+    return () => {
+      window.removeEventListener("resize", calculateHeight);
+      document.removeEventListener("mousemove", calculateHeight);
+    };
+  }, []);
 
   const { rawType, body } = tabDoc.uiRequest;
   const { model, example_model } = endpoint?.request || {};
@@ -155,17 +188,18 @@ const CodeEditor: React.FC = () => {
   return (
     <div className="w-full">
       <div
+        ref={containerRef}
         spellCheck={false}
         autoCorrect="off"
         className="
-        relative
-        w-full
-        min-h-[350px]
-        bg-transparent
-        border border-surface-500/50
-        rounded-md
-        overflow-hidden
-      "
+          relative
+          w-full
+          bg-transparent
+          border border-surface-500/50
+          rounded-md
+          overflow-hidden
+        "
+        style={{ height: editorHeight }}
       >
         <div className="absolute top-2 right-4 z-10 flex gap-2">
           {/* Reset */}

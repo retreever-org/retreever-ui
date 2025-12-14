@@ -51,6 +51,7 @@ const ResponsePanel: React.FC = () => {
 
   return (
     <div
+      data-response-panel
       className="
         absolute
         bottom-0 inset-x-0
