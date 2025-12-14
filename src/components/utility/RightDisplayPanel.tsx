@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useRightPanelStore } from "../../stores/right-panel-store";
-import { LeftDoubleIcon } from "../../svgs/svgs";
 import { useUtilityViewState } from "../../stores/utility-view-store";
 import { useDockStore } from "../../stores/dock-store";
 import UtilityHeader from "./UtilityHeader";
