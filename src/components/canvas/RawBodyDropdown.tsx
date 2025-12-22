@@ -14,6 +14,14 @@ const RAW_TYPE_TO_CONSUMES: Record<RawBodyType, string> = {
   text: "text/plain",
 };
 
+const CONSUMES_TO_RAW_TYPE: Partial<Record<string, RawBodyType>> = {
+  "application/json": "JSON",
+  "application/xml": "XML",
+  "text/html": "HTML",
+  "application/javascript": "JavaScript",
+  "text/plain": "text",
+};
+
 const RawBodyDropdown: React.FC = () => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -24,8 +32,26 @@ const RawBodyDropdown: React.FC = () => {
   if (!ui || ui.bodyType !== "raw") return null;
 
   const hasConsumes = endpoint?.consumes && endpoint?.consumes.length > 0;
-  const value = ui.rawType ?? "JSON";
-  const options: RawBodyType[] = ["text", "JSON", "XML", "HTML", "JavaScript"];
+  const allOptions: RawBodyType[] = [
+    "text",
+    "JSON",
+    "XML",
+    "HTML",
+    "JavaScript",
+  ];
+
+  const options = hasConsumes
+    ? Array.from(
+        new Set(
+          endpoint!.consumes.map((c) => CONSUMES_TO_RAW_TYPE[c]).filter(Boolean)
+        )
+      )
+    : allOptions;
+
+  const value: RawBodyType =
+    ui.rawType && options.includes(ui.rawType)
+      ? ui.rawType
+      : options[0] ?? "JSON";
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -54,13 +80,12 @@ const RawBodyDropdown: React.FC = () => {
     <div ref={rootRef} className="relative inline-block text-xs">
       <button
         type="button"
-        disabled={hasConsumes}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
         className="h-8 px-3 rounded-md flex items-center gap-2
                    text-surface-100 bg-surface-700
-                   border border-surface-600 outline-none disabled:cursor-not-allowed"
+                   border border-surface-600 outline-none"
       >
         <span className="whitespace-nowrap">{value}</span>
         <svg
@@ -89,6 +114,7 @@ const RawBodyDropdown: React.FC = () => {
                      border border-surface-500/50 bg-surface-700 p-1"
         >
           {options.map((opt) => (
+            opt &&
             <button
               key={opt}
               type="button"
