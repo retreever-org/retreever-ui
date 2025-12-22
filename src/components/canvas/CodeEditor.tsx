@@ -43,14 +43,15 @@ const retreeverDark = createTheme({
     gutterForeground: "#6b7280",
   },
   styles: [
-    { tag: tags.comment, color: "#9ca3af", fontStyle: "italic" },
-    { tag: tags.string, color: "#CE9178" },
-    { tag: tags.number, color: "#fbbf24" },
-    { tag: tags.bool, color: "#f87171" },
+    { tag: tags.comment, color: "#9198A1"},
+    { tag: tags.string, color: "#A5D6FF" },
+    { tag: tags.number, color: "#D2A8FF" },
+    { tag: tags.bool, color: "#79C0FF" },
     { tag: tags.null, color: "#f87171" },
-    { tag: tags.keyword, color: "#60a5fa" },
-    { tag: tags.operator, color: "#c084fc" },
-    { tag: tags.propertyName, color: "#9CDCFE" },
+    { tag: tags.keyword, color: "#FF7B72" },
+    { tag: tags.operator, color: "#F0F6FC" },
+    { tag: tags.propertyName, color: "#7EE787" },
+    { tag: tags.variableName, color: "#F0F6FC" },
   ],
 });
 
