@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useViewingDocStore } from "../../stores/viewing-doc-store";
 import type { RequestKeyValueEntry } from "../../types/editor.types";
 import { CheckIcon2, DeleteIcon } from "../../svgs/svgs";
@@ -33,16 +33,11 @@ const ensureTrailingEmpty = (
 -------------------------- */
 
 const RequestKeyValueEditor: React.FC = () => {
+  const [multiRowsEmpty, setMultiRowsEmpty] = useState<boolean>(false);
   const { tabDoc, updateUiRequest } = useViewingDocStore();
   if (!tabDoc) return null;
 
   const { editing, bodyType, body } = tabDoc.uiRequest;
-  if (
-    editing !== "headers" &&
-    editing !== "params" &&
-    tabDoc.uiRequest.bodyType !== "x-www-form-urlencoded"
-  )
-    return null;
 
   let sourceKey: "headers" | "queryParams" | "body.urlEncoded" | null = null;
 
@@ -52,12 +47,25 @@ const RequestKeyValueEditor: React.FC = () => {
     sourceKey = "body.urlEncoded";
   }
 
-  if (!sourceKey) return null;
-
   const rows =
     sourceKey === "body.urlEncoded"
       ? ensureTrailingEmpty(body.urlEncoded)
-      : ensureTrailingEmpty(tabDoc.uiRequest[sourceKey]);
+      : sourceKey && ensureTrailingEmpty(tabDoc.uiRequest[sourceKey]);
+
+  useEffect(() => {
+    if (rows) {
+      const nonEmptyRows = rows.filter((r) => isEmptyRow(r));
+      setMultiRowsEmpty(nonEmptyRows.length > 1);
+    }
+  }, [rows]);
+
+  if (
+    editing !== "headers" &&
+    editing !== "params" &&
+    tabDoc.uiRequest.bodyType !== "x-www-form-urlencoded"
+  )
+    return null;
+  if (!sourceKey) return null;
 
   const updateRows = (next: RequestKeyValueEntry[]) => {
     if (sourceKey === "body.urlEncoded") {
@@ -75,13 +83,17 @@ const RequestKeyValueEditor: React.FC = () => {
   };
 
   const updateRow = (index: number, patch: Partial<RequestKeyValueEntry>) => {
-    const next = rows.map((r, i) => (i === index ? { ...r, ...patch } : r));
-    updateRows(next);
+    if (rows) {
+      const next = rows.map((r, i) => (i === index ? { ...r, ...patch } : r));
+      updateRows(next);
+    }
   };
 
   const deleteRow = (index: number) => {
-    const next = rows.filter((_, i) => i !== index);
-    updateRows(next);
+    if (rows) {
+      const next = rows.filter((_, i) => i !== index);
+      updateRows(next);
+    }
   };
 
   return (
@@ -103,7 +115,7 @@ const RequestKeyValueEditor: React.FC = () => {
         </thead>
 
         <tbody>
-          {rows.map((row, index) => {
+          {rows && rows.map((row, index) => {
             const disabledKey = !row.editable || !row.local;
             const empty = isEmptyRow(row);
 
@@ -178,7 +190,7 @@ const RequestKeyValueEditor: React.FC = () => {
 
                 {/* DELETE */}
                 <td className="px-2 border border-l-0 border-surface-500/30 text-right">
-                  {row.local && !empty && (
+                  {row.local && (!empty || multiRowsEmpty) && (
                     <button
                       onClick={() => deleteRow(index)}
                       className="opacity-0 group-hover:opacity-100
