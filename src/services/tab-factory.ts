@@ -107,7 +107,7 @@ export function buildTabDocFromEndpoint(
       url,
       headers,
       queryParams,
-      consumes,
+      consumes: ep.consumes,
 
       editing: "params",
       bodyType: activeResolved.bodyType,
