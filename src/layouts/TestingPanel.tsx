@@ -7,6 +7,7 @@ import RequestKeyValueEditor from "../components/canvas/RequestKeyValueEditor";
 import FormEditor from "../components/canvas/FormEditor";
 import CodeEditor from "../components/canvas/CodeEditor";
 import ResponsePanel from "./ResponsePanel";
+import BinaryUpload from "../components/canvas/BinaryUpload";
 
 const TestingPanel: React.FC = () => {
   const { endpoint, tabDoc } = useViewingDocStore();
@@ -18,9 +19,7 @@ const TestingPanel: React.FC = () => {
       const navbar = document.querySelector("[data-navbar]");
       const tabStrip = document.querySelector("[data-endpoint-tab-strip]");
 
-      const navbarBottom = navbar
-        ? navbar.getBoundingClientRect().bottom
-        : 0;
+      const navbarBottom = navbar ? navbar.getBoundingClientRect().bottom : 0;
 
       const tabStripHeight = tabStrip
         ? tabStrip.getBoundingClientRect().height
@@ -67,6 +66,11 @@ const TestingPanel: React.FC = () => {
       <RequestKeyValueEditor />
       <FormEditor />
 
+      {/* Binary Upload Component */}
+      {tabDoc.uiRequest.bodyType === "binary" &&
+        tabDoc.uiRequest.editing === "body" && <BinaryUpload />}
+
+      {/* Code Editor Component */}
       {tabDoc.uiRequest.bodyType === "raw" &&
         tabDoc.uiRequest.editing === "body" && <CodeEditor />}
 

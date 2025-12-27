@@ -37,6 +37,19 @@ const FormEditor: React.FC = () => {
 
   const rows = ensureTrailingEmpty(body?.formData ?? []);
 
+  const updateRows = (next: FormEntry[]) => {
+    if (body) {
+      updateUiRequest({
+        body: {
+          raw: body.raw,
+          formData: ensureTrailingEmpty(next),
+          urlEncoded: body.urlEncoded ?? [],
+          binaryFileId: body.binaryFileId,
+        },
+      });
+    }
+  };
+
   useEffect(() => {
     if (body) {
       const normalized = ensureTrailingEmpty(body.formData ?? []);
@@ -53,19 +66,6 @@ const FormEditor: React.FC = () => {
 
   if (!tabDoc) return null;
   if (editing !== "body" || bodyType !== "form-data") return null;
-
-  const updateRows = (next: FormEntry[]) => {
-    if (body) {
-      updateUiRequest({
-        body: {
-          raw: body.raw,
-          formData: ensureTrailingEmpty(next),
-          urlEncoded: body.urlEncoded ?? [],
-          binaryFileId: body.binaryFileId,
-        },
-      });
-    }
-  };
 
   const updateRow = (index: number, patch: Partial<FormEntry>) => {
     if (rows) {
