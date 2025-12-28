@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type DragEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type DragEvent } from "react";
 import { uploadFile, deleteFile, getFile } from "../../storage/file-storage";
 import { useViewingDocStore } from "../../stores/viewing-doc-store";
 import { DeleteIcon, DocumentIcon } from "../../svgs/svgs";
@@ -47,22 +47,31 @@ const BinaryUpload = () => {
 
   const fileId = tabDoc?.uiRequest.body.binaryFileId;
 
-  if (fileId) {
-    getFile(fileId).then((blob) => {
+  const loadFileName = async () => {
+    if (fileId) {
+      const blob = await getFile(fileId);
       if (blob) {
-        if(blob instanceof File) {
-            setFileName(blob.name ?? fileId);
-            return;
+        if (blob instanceof File) {
+          setFileName(blob.name ?? fileId);
+          return;
         }
       } else {
         setFileName(null);
       }
-    });
-  }
+    }
+  };
+
+  useEffect(() => {
+    loadFileName();
+  }, []);
 
   return (
-    <div className={`w-2/5 h-16 group ${fileId ? "bg-surface-800" : "bg-transparent"}`}>
-        <span>{}</span>
+    <div
+      className={`w-2/5 h-16 group ${
+        fileId ? "bg-surface-800" : "bg-transparent"
+      }`}
+    >
+      <span>{}</span>
       {fileId ? (
         <div
           className="
@@ -76,9 +85,7 @@ const BinaryUpload = () => {
             <span className="text-surface-200">
               <DocumentIcon />
             </span>
-            <span className="truncate max-w-60">
-              {fileName}
-            </span>
+            <span className="truncate max-w-60">{fileName}</span>
           </div>
 
           <button
