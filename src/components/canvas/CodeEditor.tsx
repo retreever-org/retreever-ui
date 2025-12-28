@@ -253,8 +253,8 @@ const CodeEditor: React.FC = () => {
           spellCheck={false}
           autoCorrect="off"
           extensions={extensions}
-          height="350px"
-          className="scroll-thin"
+          height="100%"
+          className="h-full scroll-thin scroll-auto"
           onChange={(value) => {
             updateUiRequest({
               body: {
