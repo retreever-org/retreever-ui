@@ -15,7 +15,7 @@ export default function EnvironmentPanel() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 p-4 bg-transparent text-surface-100">
+    <div className="w-full h-full flex flex-col gap-4 p-4 pb-20 bg-transparent text-surface-100">
       {!isOnline && (
         <div className="flex gap-2 items-center text-sm text-surface-200 p-1.5 border border-warn/80 rounded-lg bg-warn/10">
           <span className="text-warn"><WarningIcon /></span>

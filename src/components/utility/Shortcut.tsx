@@ -4,7 +4,7 @@ const Shortcut: React.FC = () => {
   const shortcuts: ShortcutItem[] = SHORTCUTS;
 
   return (
-    <section className="h-full w-full px-4 py-6 bg-transparent">
+    <section className="h-full w-full px-4 py-6 pb-20 bg-transparent">
       <table className="w-full border-collapse">
         <thead>
           <tr>

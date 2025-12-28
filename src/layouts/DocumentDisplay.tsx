@@ -21,7 +21,7 @@ const DocumentDisplay: React.FC = () => {
   const { request, response, errors } = endpoint;
 
   return (
-    <div className="w-full h-full overflow-auto scroll-thin scroll-bar-round p-4 space-y-10 bg-transparent">
+    <div className="w-full h-full pb-20 overflow-auto scroll-thin scroll-bar-round p-4 space-y-10 bg-transparent">
       <div>
         {/* Heading */}
 
