@@ -24,23 +24,31 @@ export const sortTabs = (list?: TabItem[]) => {
   return [...(list ?? [])].sort((a, b) => a.order - b.order);
 };
 
-/**
- * Calculate where to place the context menu so that it appears below the target element
- * and doesn't overflow the container horizontally.
- */
-export const calculateMenuPosition = (
-  container: HTMLElement,
-  target: HTMLElement,
-  opts: { menuWidth: number; gap: number }
-) => {
-  const containerRect = container.getBoundingClientRect();
-  const elRect = target.getBoundingClientRect();
+// /**
+//  * Calculate where to place the context menu so that it appears below the target element
+//  * and doesn't overflow the container horizontally.
+//  */
+// export const calculateMenuPosition = (
+//   container: HTMLElement,
+//   target: HTMLElement,
+//   opts: { menuWidth: number; gap: number }
+// ) => {
+//   const containerRect = container.getBoundingClientRect();
+//   const elRect = target.getBoundingClientRect();
 
-  const left = elRect.left - containerRect.left;
-  const top = elRect.bottom - containerRect.top - 10;
+//   // Viewport left: start right of target
+//   let left = elRect.right + opts.gap;
+  
+//   // Flip left if overflows container/viewport right edge
+//   const spaceRight = containerRect.right - elRect.right;
+//   if (spaceRight < opts.menuWidth) {
+//     left = elRect.left - opts.menuWidth - opts.gap;
+//   }
+  
+//   // Clamp to container bounds (with padding)
+//   left = Math.max(containerRect.left + 8, Math.min(left, containerRect.right - opts.menuWidth - 8));
+  
+//   const top = elRect.bottom + opts.gap;  // Viewport top, below target
 
-  const maxLeft = containerRect.width - opts.menuWidth;
-  const finalLeft = Math.max(8, Math.min(left, maxLeft)) + 12;
-
-  return { left: finalLeft, top };
-};
+//   return { left, top };
+// };

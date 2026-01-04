@@ -1,4 +1,3 @@
-// File: src/components/EndpointTabStrip.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { viewingDocStore } from "../stores/viewing-doc-store";
 import { useTabOrderStore } from "../stores/tab-order-store";
@@ -16,9 +15,9 @@ import {
   extractMethod,
   getMethodColor,
   sortTabs,
-  calculateMenuPosition,
 } from "../components/canvas/EndpointTabUtil";
 import { deleteAllFiles, deleteFile } from "../storage/file-storage";
+import { createPortal } from "react-dom";
 
 export const EndpointTabStrip: React.FC = () => {
   const {
@@ -170,16 +169,16 @@ export const EndpointTabStrip: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    const container = containerRef.current ?? scrollRef.current;
-    if (!container) return;
+    const gap = 6;
+    let left = e.clientX + gap;
+    let top = e.clientY + gap;
 
-    const target = e.currentTarget as HTMLElement;
-    const pos = calculateMenuPosition(container, target, {
-      menuWidth: 180,
-      gap: 6,
-    });
+    // Only flip left if overflows viewport (bottom-right priority)
+    if (left + 180 > window.innerWidth) {
+      left = e.clientX - 180 - gap;
+    }
 
-    setCtx({ visible: true, left: pos.left, top: pos.top, tabKey });
+    setCtx({ visible: true, left, top, tabKey });
   };
 
   // --------------------------------- UI Component ---------------------------------
@@ -246,21 +245,26 @@ export const EndpointTabStrip: React.FC = () => {
       </div>
 
       {/* Context menu card */}
-      {ctx.visible && ctx.tabKey && (
-        <div
-          ref={menuRef}
-          style={{ left: ctx.left, top: ctx.top }}
-          className={`text-xs absolute z-50 bg-black/30 backdrop-blur-md border border-surface-500/30 rounded-md shadow-lg`}
-        >
-          <div className="flex flex-col space-y-1 py-1 min-w-48">
-            <CtxButton onClick={() => onCtxClose(ctx.tabKey)}>Close</CtxButton>
-            <CtxButton onClick={() => onCtxCloseOther(ctx.tabKey)}>
-              Close Other
-            </CtxButton>
-            <CtxButton onClick={() => onCtxCloseAll()}>Close All</CtxButton>
-          </div>
-        </div>
-      )}
+      {ctx.visible &&
+        ctx.tabKey &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="text-xs fixed z-9999 bg-black/30 backdrop-blur-md border border-surface-500/30 rounded-md shadow-xl p-2 min-w-40"
+            style={{ left: `${ctx.left}px`, top: `${ctx.top}px` }}
+          >
+            <div className="flex flex-col space-y-1">
+              <CtxButton onClick={() => onCtxClose(ctx.tabKey!)}>
+                Close
+              </CtxButton>
+              <CtxButton onClick={() => onCtxCloseOther(ctx.tabKey!)}>
+                Close Other
+              </CtxButton>
+              <CtxButton onClick={() => onCtxCloseAll()}>Close All</CtxButton>
+            </div>
+          </div>,
+          document.body // Appends to <body>
+        )}
     </div>
   );
 };
