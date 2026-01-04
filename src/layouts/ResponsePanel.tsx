@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ResponseViewer from "./ResponseViewer";
 
 const MIN_HEIGHT = 48;
 
@@ -83,8 +84,8 @@ const ResponsePanel: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-3 text-sm text-surface-200">
-        Response Panel
+      <div className="flex-1 overflow-auto text-sm text-surface-200">
+        <ResponseViewer/>
       </div>
     </div>
   );

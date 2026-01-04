@@ -1,0 +1,58 @@
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-type": "application/json; charset=utf-8",
+    "content-length": "2143",
+    "set-cookie": "session=abc123xyz; Path=/; HttpOnly; Secure; SameSite=Lax",
+    "set-cookie": "theme=dark; Path=/; Max-Age=86400",
+    "x-request-id": "req-abc123-456def-789ghi",
+    "x-rate-limit-remaining": "99",
+    "cache-control": "public, max-age=3600",
+    "etag": "W/\"abc123\"",
+    "vary": "Accept-Encoding",
+    "server": "nginx/1.24.0"
+  },
+  "cookies": [
+    {
+      "name": "session",
+      "value": "abc123xyz",
+      "path": "/",
+      "domain": "api.example.com",
+      "expires": "2026-01-10T12:00:00Z",
+      "maxAge": 2592000,
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "theme",
+      "value": "dark",
+      "path": "/",
+      "domain": ".example.com",
+      "maxAge": 86400,
+      "secure": false,
+      "httpOnly": false,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "_csrf",
+      "value": "xyz789-token-456",
+      "path": "/",
+      "secure": true,
+      "httpOnly": false,
+      "sameSite": "Strict",
+      "local": true
+    }
+  ],
+  "body": "{\"success\":true,\"data\":{\"userId\":123,\"email\":\"user@example.com\",\"profile\":{\"name\":\"John Doe\",\"avatar\":\"https://example.com/avatar.jpg\"},\"items\":[{\"id\":1,\"title\":\"First item\"},{\"id\":2,\"title\":\"Second item\"}],\"metadata\":{\"total\":150,\"page\":1,\"limit\":10}},\"timestamp\":1640995200000}",
+  "durationMs": 127,
+  "timestamp": 1735996800000,
+  "sizeBytes": 2143,
+  "transferSpeed": 16.9,
+  "requestId": "req-abc123-456def-789ghi",
+  "contentType": "application/json",
+  "viewMode": "json"
+}

@@ -27,15 +27,43 @@ export interface TabDoc {
 
   lastResponse?: {
     status?: number;
-    headers?: Record<string, string>;
+    statusText?: string;
+    headers?: Record<string, string>;  // Raw headers unchanged
+    cookies?: CookieEntry[];           // NEW: Parsed cookies array
     body?: string;
-    timeMs?: number;
+    durationMs?: number;
     timestamp?: number;
+    sizeBytes?: number;
+    transferSpeed?: number;
+    requestId?: string;
+
+    // Response rendering
+    contentType?: string;
+    viewMode?: ResponseViewMode;
   };
 
   createdAt: number;
   updatedAt: number;
 }
+
+export type ResponseViewMode =
+  | "json"
+  | "text"
+  | "html"
+  | "xml"
+  | "raw" // Textual
+  | "auto"; // Media: image/video/audio/pdf/csv → preview only
+
+// Media MIME patterns (implicit handling)
+const MEDIA_TYPES = {
+  image: ["image/"],
+  video: ["video/"],
+  audio: ["audio/"],
+  pdf: ["application/pdf"],
+  csv: ["text/csv"],
+  excel: ["application/vnd.", "application/excel"],
+  multipart: ["multipart/"],
+};
 
 export interface TabOrderItem {
   tabKey: string;
@@ -77,3 +105,16 @@ export type BodyType =
   | "raw";
 
 export type RawBodyType = "text" | "JSON" | "XML" | "HTML" | "JavaScript";
+
+export interface CookieEntry {
+  name: string;
+  value: string;
+  domain?: string;
+  path: string;
+  expires?: string; // ISO date string
+  maxAge?: number;  // seconds
+  secure: boolean;
+  httpOnly: boolean;
+  sameSite?: 'Strict' | 'Lax' | 'None';
+  local: boolean;   // parsed from response (vs user-added)
+}
