@@ -1,31 +1,68 @@
-import React from 'react';
+import React from "react";
+import dummyResponse from "../../util/dummyResponse.json";
+import type { CookieEntry } from "../../types/editor.types";
+import { useViewingTabDoc } from "../../stores/viewing-doc-store";
 
-interface Cookie {
-  name: string;
-  value: string;
-  expires: string;
-  path: string;
-  httpOnly?: boolean;
-}
+export const CookiesTabContent: React.FC = () => {
+  const tabDoc = useViewingTabDoc();
+  const rawCookies = tabDoc?.lastResponse?.cookies ?? dummyResponse.cookies;
+  const cookies: CookieEntry[] = Array.isArray(rawCookies)
+    ? rawCookies.map((c) => ({
+        ...c,
+        sameSite: (["Lax", "Strict", "None"] as const).includes(c.sameSite as any)
+          ? (c.sameSite as CookieEntry["sameSite"])
+          : undefined,
+      }))
+    : [];
 
-interface CookiesTabContentProps {
-  data: Cookie[];
-}
-
-export const CookiesTabContent: React.FC<CookiesTabContentProps> = ({ data }) => (
-  <div className="space-y-3">
-    {data.map((cookie, i) => (
-      <div key={i} className="p-3 bg-surface-900/50 rounded-lg space-y-1">
-        <div className="flex justify-between items-center">
-          <span className="font-medium">{cookie.name}</span>
-          <span className="font-mono bg-surface-800 px-2 py-0.5 rounded text-xs">{cookie.value}</span>
-        </div>
-        <div className="grid grid-cols-2 gap-4 text-xs text-surface-500">
-          <div>Expires: {cookie.expires}</div>
-          <div>Path: {cookie.path}</div>
-          {cookie.httpOnly && <div className="text-orange-400">HttpOnly</div>}
-        </div>
+  if (cookies.length === 0) {
+    return (
+      <div className="text-surface-400 p-4 text-center text-sm">
+        No cookies set
       </div>
-    ))}
-  </div>
-);
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs [&_td]:p-2 [&_th]:p-2 [&_th]:font-medium [&_th]:text-surface-400 [&_tr]:border-b [&_tr]:border-b-surface-500/50 [&_tr:last-child]:border-b-0 [&_tr]:hover:bg-surface-900/10 [&_tr]:transition-colors">
+        <thead>
+          <tr>
+            <th className="w-20 text-left">Name</th>
+            <th className="w-40 text-left">Value</th>
+            <th className="w-[100px] text-left">Domain</th>
+            <th className="w-16 text-left">Path</th>
+            <th className="w-[90px] text-left">Expires</th>
+            <th className="w-20 text-left">Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cookies.map((cookie, i) => (
+            <tr key={i}>
+              <td className="font-mono font-medium">{cookie.name}</td>
+              <td className="font-mono truncate">{cookie.value}</td>
+              <td className="text-surface-500">{cookie.domain ?? "-"}</td>
+              <td className="text-surface-500">{cookie.path}</td>
+              <td className="text-surface-500">
+                {cookie.expires ?? cookie.maxAge 
+                  ? `${cookie.maxAge}s` 
+                  : "Session"}
+              </td>
+              <td>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {cookie.sameSite && (
+                    <span className="px-1.5 py-0.5 bg-surface-500/20 text-xs rounded font-mono">
+                      {cookie.sameSite}
+                    </span>
+                  )}
+                  {cookie.secure && <span className="px-1.5 py-0.5 bg-primary-400/10 text-primary-400 text-xs rounded font-mono">Secure</span>}
+                  {cookie.httpOnly && <span className="px-1.5 py-0.5 bg-orange-800/10 text-orange-400 text-xs rounded font-mono">HttpOnly</span>}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

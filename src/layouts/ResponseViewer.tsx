@@ -1,7 +1,8 @@
-// ResponseViewer.tsx (updated)
 import React, { useState } from "react";
 import BodyTabContent from "../components/response/BodyTabContent";
 import HeadersTabContent from "../components/response/HeadersTabContent";
+import dummyResponse from "../util/dummyResponse.json"; 
+import { useViewingTabDoc } from "../stores/viewing-doc-store";
 import { CookiesTabContent } from "../components/response/CookiesTabContent";
 
 type TabType = "body" | "headers" | "cookies";
@@ -10,37 +11,17 @@ interface ResponseViewerProps {}
 
 const ResponseViewer: React.FC<ResponseViewerProps> = () => {
   const [activeTab, setActiveTab] = useState<TabType>("body");
+  
+  // Live data from store + dev fallback
+  const tabDoc = useViewingTabDoc();
+  const lastResponse = tabDoc?.lastResponse ?? dummyResponse;
 
-  // Static data (replace with Zustand later)
-  const staticData = {
-    status: 200 as number,
-    statusText: 'OK' as string,
-    // status: 404 as number,
-    // statusText: "Not Found" as string,
-    // status: 302 as number,
-    // statusText: "Found" as string,
-    // status: 100 as number,
-    // statusText: "Optional" as string,
-    durationMs: 127 as number,
-    timestamp: Date.now() as number,
-    sizeBytes: 2143 as number,
-    headers: {
-      "content-type": "application/json",
-      "content-length": "2143",
-      "set-cookie": "session=abc123; Path=/; HttpOnly",
-      "x-request-id": "req-xyz789",
-    } as Record<string, string>,
-    cookies: [
-      {
-        name: "session",
-        value: "abc123",
-        expires: "2026-01-05",
-        path: "/",
-        httpOnly: true,
-      },
-      { name: "theme", value: "dark", expires: "2026-01-04", path: "/" },
-    ],
-  };
+  // Derive metrics with fallbacks
+  const status = lastResponse.status ?? 200;
+  const statusText = lastResponse.statusText ?? "OK";
+  const durationMs = lastResponse.durationMs ?? 127;
+  const timestamp = lastResponse.timestamp ?? Date.now();
+  const sizeBytes = lastResponse.sizeBytes ?? 2143;
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -52,6 +33,14 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
     const mb = bytes / (1024 * 1024);
     const seconds = ms / 1000;
     return `${(mb / seconds).toFixed(1)} MB/s`;
+  };
+
+  // Status badge class logic
+  const getStatusClass = (status: number) => {
+    if (status >= 200 && status < 300) return "bg-green-500/20 text-green-400 border-green-500/30";
+    if (status >= 400) return "bg-rose-500/20 text-rose-400 border-rose-500/30";
+    if (status >= 300 && status < 400) return "bg-amber-500/20 text-amber-400 border-amber-500/50";
+    return "bg-surface-500/20 text-surface-300 border-surface-500/50";
   };
 
   return (
@@ -79,39 +68,21 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
         <div className="ml-auto flex items-center justify-between p-2 space-x-3 shrink-0 min-w-[280px]">
           {/* Status */}
           <div className="flex items-center space-x-3">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-mono border ${
-                staticData.status >= 200 && staticData.status < 300
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : staticData.status >= 400 
-                  ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                  : staticData.status >= 300 && staticData.status < 400
-                  ? "bg-amber-500/20 text-amber-400 border-amber-500/50"
-                  : "bg-surface-500/20 text-surface-300 border-surface-500/50"
-              }`}
-            >
-              {staticData.status} {staticData.statusText}
+            <span className={`px-3 py-1 rounded-full text-xs font-mono border ${getStatusClass(status)}`}>
+              {status} {statusText}
             </span>
             <span className="text-sm text-surface-400">
-              <span className="text-surface-400 font-mono">
-                {staticData.durationMs}
-              </span>{" "}
-              ms
+              <span className="text-surface-400 font-mono">{durationMs}</span> ms
             </span>
             <span className="text-xs text-surface-500">
-              {new Date(staticData.timestamp).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
 
           {/* Size + Speed */}
           <div className="text-xs text-surface-400 space-x-1">
-            <span>{formatBytes(staticData.sizeBytes)}</span>
-            <span className="font-mono">
-              ↓ {formatSpeed(staticData.sizeBytes, staticData.durationMs)}
-            </span>
+            <span>{formatBytes(sizeBytes)}</span>
+            <span className="font-mono">↓ {formatSpeed(sizeBytes, durationMs)}</span>
           </div>
         </div>
       </div>
@@ -119,12 +90,8 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
       {/* Tab Content */}
       <div className="flex-1 pt-3 min-h-0 overflow-auto scroll-thin text-sm p-3">
         {activeTab === "body" && <BodyTabContent />}
-        {activeTab === "headers" && (
-          <HeadersTabContent data={staticData.headers} />
-        )}
-        {activeTab === "cookies" && (
-          <CookiesTabContent data={staticData.cookies} />
-        )}
+        {activeTab === "headers" && <HeadersTabContent />}
+        {activeTab === "cookies" && <CookiesTabContent />}
       </div>
     </div>
   );
