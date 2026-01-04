@@ -30,7 +30,7 @@ const getExtensions = (rawType: RawBodyType | undefined) => {
 
 /* ---------------- custom theme ---------------- */
 
-const retreeverDark = createTheme({
+export const retreeverDark = createTheme({
   theme: "dark",
   settings: {
     background: "transparent",
@@ -55,7 +55,7 @@ const retreeverDark = createTheme({
   ],
 });
 
-const monoFont = EditorView.theme({
+export const monoFont = EditorView.theme({
   "&": {
     fontFamily: "JetBrains Mono, Fira Code, Menlo, Monaco, Consolas, monospace",
     fontSize: "13px",

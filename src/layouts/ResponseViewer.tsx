@@ -88,7 +88,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 pt-3 min-h-0 overflow-auto scroll-thin text-sm p-3">
+      <div className="flex-1 min-h-0 overflow-auto scroll-thin text-sm">
         {activeTab === "body" && <BodyTabContent />}
         {activeTab === "headers" && <HeadersTabContent />}
         {activeTab === "cookies" && <CookiesTabContent />}

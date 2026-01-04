@@ -1,0 +1,111 @@
+import React, { useMemo } from "react";
+import CodeMirror from "@uiw/react-codemirror";
+import { EditorView } from "@codemirror/view";
+import { json } from "@codemirror/lang-json";
+import { xml } from "@codemirror/lang-xml";
+import { html } from "@codemirror/lang-html";
+import { useViewingTabDoc } from "../../stores/viewing-doc-store";
+import dummyResponse from "../../util/dummyResponse.json";
+import type { ResponseViewMode } from "../../types/editor.types";
+import { monoFont, retreeverDark } from "../canvas/CodeEditor";
+
+const getExtensions = (viewMode: ResponseViewMode) => {
+  switch (viewMode) {
+    case "json":
+      return [json()];
+    case "xml":
+      return [xml()];
+    case "html":
+      return [html()];
+    default:
+      return [];
+  }
+};
+
+/* Safe formatter - only if content matches */
+const formatPayload = (body: string, viewMode: ResponseViewMode): string => {
+  if (!body || body.trim() === "{}") return body;
+
+  const trimmed = body.trim();
+
+  try {
+    switch (viewMode) {
+      case "json":
+        if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+          return JSON.stringify(JSON.parse(body), null, 2);
+        }
+        return body;
+
+      case "xml":
+        if (
+          trimmed.startsWith("<") &&
+          (trimmed.includes("</") || trimmed.includes("/>"))
+        ) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(body, "text/xml");
+          if (doc.getElementsByTagName("parsererror").length === 0) {
+            return new XMLSerializer().serializeToString(doc);
+          }
+        }
+        return body;
+
+      case "html":
+        if (trimmed.startsWith("<") && trimmed.includes("</")) {
+          const doc = new DOMParser().parseFromString(body, "text/html");
+          if (!doc.getElementsByTagName("parsererror").length) {
+            return doc.body.innerHTML;
+          }
+        }
+        return body;
+
+      case "text":
+      case "raw":
+      default:
+        return body;
+    }
+  } catch {
+    return body;
+  }
+};
+
+interface ResponsePayloadDisplayProps {
+  viewMode: ResponseViewMode;
+}
+
+const ResponsePayloadDisplay: React.FC<ResponsePayloadDisplayProps> = ({
+  viewMode,
+}) => {
+  const tabDoc = useViewingTabDoc();
+  const rawBody = tabDoc?.lastResponse?.body ?? dummyResponse.body ?? "{}";
+  const body = useMemo(
+    () => formatPayload(rawBody, viewMode),
+    [rawBody, viewMode]
+  );
+
+  const extensions = useMemo(
+    () => [...getExtensions(viewMode), EditorView.lineWrapping, monoFont],
+    [viewMode]
+  );
+
+  return (
+    <CodeMirror
+      value={body}
+      theme={retreeverDark}
+      readOnly
+      spellCheck={false}
+      extensions={extensions}
+      className="h-full w-full"
+      basicSetup={{
+        lineNumbers: true,
+        foldGutter: true,
+        highlightActiveLine: true,
+        indentOnInput: true,
+        bracketMatching: true,
+        closeBrackets: true,
+        highlightSelectionMatches: true,
+      }}
+    />
+  );
+};
+
+export default ResponsePayloadDisplay;
