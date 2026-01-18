@@ -1,0 +1,2 @@
+export const ALLOW_PLACEHOLDER_RESPONSE_RENDERING: boolean =
+  import.meta.env.VITE_ALLOW_PLACEHOLDER_RESPONSE_RENDERING === "true";
