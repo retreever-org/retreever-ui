@@ -4,6 +4,7 @@ import HeadersTabContent from "../components/response/HeadersTabContent";
 import dummyResponse from "../util/dummyResponse.json"; 
 import { useViewingTabDoc } from "../stores/viewing-doc-store";
 import { CookiesTabContent } from "../components/response/CookiesTabContent";
+import { ALLOW_PLACEHOLDER_RESPONSE_RENDERING } from "../config/env-vars";
 
 type TabType = "body" | "headers" | "cookies";
 
@@ -88,11 +89,13 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 min-h-0 overflow-auto scroll-thin text-sm">
-        {activeTab === "body" && <BodyTabContent />}
-        {activeTab === "headers" && <HeadersTabContent />}
-        {activeTab === "cookies" && <CookiesTabContent />}
-      </div>
+      {ALLOW_PLACEHOLDER_RESPONSE_RENDERING && (
+        <div className="flex-1 min-h-0 overflow-auto scroll-thin text-sm">
+          {activeTab === "body" && <BodyTabContent />}
+          {activeTab === "headers" && <HeadersTabContent />}
+          {activeTab === "cookies" && <CookiesTabContent />}
+        </div>
+      )}
     </div>
   );
 };
