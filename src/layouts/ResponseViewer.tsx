@@ -15,14 +15,17 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
   
   // Live data from store + dev fallback
   const tabDoc = useViewingTabDoc();
-  const lastResponse = tabDoc?.lastResponse ?? dummyResponse;
+const lastResponse = tabDoc?.lastResponse 
+  ? tabDoc.lastResponse 
+  : (ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? dummyResponse : null);
 
   // Derive metrics with fallbacks
-  const status = lastResponse.status ?? 200;
-  const statusText = lastResponse.statusText ?? "OK";
-  const durationMs = lastResponse.durationMs ?? 127;
-  const timestamp = lastResponse.timestamp ?? Date.now();
-  const sizeBytes = lastResponse.sizeBytes ?? 2143;
+  const status = lastResponse?.status ?? undefined;
+  const statusText = lastResponse?.statusText ?? "Response Status";
+  const durationMs = lastResponse?.durationMs ?? 0;
+  const timestamp = lastResponse?.timestamp ?? new Date().getTime();
+  const sizeBytes = lastResponse?.sizeBytes ?? 0;
+  const transferSpeed = lastResponse?.transferSpeed ?? 0;
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -30,17 +33,14 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const formatSpeed = (bytes: number, ms: number) => {
-    const mb = bytes / (1024 * 1024);
-    const seconds = ms / 1000;
-    return `${(mb / seconds).toFixed(1)} MB/s`;
-  };
-
   // Status badge class logic
-  const getStatusClass = (status: number) => {
-    if (status >= 200 && status < 300) return "bg-green-500/20 text-green-400 border-green-500/30";
-    if (status >= 400) return "bg-rose-500/20 text-rose-400 border-rose-500/30";
-    if (status >= 300 && status < 400) return "bg-amber-500/20 text-amber-400 border-amber-500/50";
+  const getStatusClass = (status: number | undefined) => {
+    if(status) {
+      if (status >= 200 && status < 300) return "bg-green-500/20 text-green-400 border-green-500/30";
+      if (status >= 400) return "bg-rose-500/20 text-rose-400 border-rose-500/30";
+      if (status >= 300 && status < 400) return "bg-amber-500/20 text-amber-400 border-amber-500/50";
+      return "bg-surface-500/20 text-surface-300 border-surface-500/50";
+    }
     return "bg-surface-500/20 text-surface-300 border-surface-500/50";
   };
 
@@ -83,17 +83,22 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
           {/* Size + Speed */}
           <div className="text-xs text-surface-400 space-x-1">
             <span>{formatBytes(sizeBytes)}</span>
-            <span className="font-mono">↓ {formatSpeed(sizeBytes, durationMs)}</span>
+            <span className="font-mono">↓ {transferSpeed + " MB/s"}</span>
           </div>
         </div>
       </div>
 
       {/* Tab Content */}
-      {ALLOW_PLACEHOLDER_RESPONSE_RENDERING && (
+      {ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? (
         <div className="flex-1 min-h-0 overflow-auto scroll-thin text-sm">
           {activeTab === "body" && <BodyTabContent />}
           {activeTab === "headers" && <HeadersTabContent />}
           {activeTab === "cookies" && <CookiesTabContent />}
+        </div>
+      ) : (
+        <div className="h-full w-full space-y-1.5 flex flex-col justify-center items-center">
+          <div className="text-surface-400">Nothing to show</div>
+          <div className="text-surface-400/80">You haven't made any request yet!</div>
         </div>
       )}
     </div>
