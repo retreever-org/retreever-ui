@@ -1,0 +1,57 @@
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-type": "text/html; charset=utf-8",
+    "content-length": "2143",
+    "set-cookie": "session=abc123xyz; Path=/; HttpOnly; Secure; SameSite=Lax",
+    "x-request-id": "req-abc123-456def-789ghi",
+    "x-rate-limit-remaining": "99",
+    "cache-control": "public, max-age=3600",
+    "etag": "W/\"abc123\"",
+    "vary": "Accept-Encoding",
+    "server": "nginx/1.24.0"
+  },
+  "cookies": [
+    {
+      "name": "session",
+      "value": "abc123xyz",
+      "path": "/",
+      "domain": "api.example.com",
+      "expires": "2026-01-10T12:00:00Z",
+      "maxAge": 2592000,
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "theme",
+      "value": "dark",
+      "path": "/",
+      "domain": ".example.com",
+      "maxAge": 86400,
+      "secure": false,
+      "httpOnly": false,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "_csrf",
+      "value": "xyz789-token-456",
+      "path": "/",
+      "secure": true,
+      "httpOnly": false,
+      "sameSite": "Strict",
+      "local": true
+    }
+  ],
+  "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }\n    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1.5rem; max-width: 600px; margin: auto; }\n    .header { border-bottom: 1px solid #334155; padding-bottom: 1rem; margin-bottom: 1rem; }\n    .status { color: #4ade80; font-weight: bold; }\n    .item-list { list-style: none; padding: 0; }\n    .item { background: #334155; margin: 0.5rem 0; padding: 0.75rem; border-radius: 4px; display: flex; justify-content: space-between; }\n    .avatar { border-radius: 50%; width: 40px; vertical-align: middle; margin-right: 10px; }\n  </style>\n</head>\n<body>\n  <div class=\"card\">\n    <div class=\"header\">\n      <h1>Success: <span class=\"status\">true</span></h1>\n      <p>User ID: 123 | email: user@example.com</p>\n    </div>\n    <div class=\"profile\">\n      <img src=\"https://example.com/avatar.jpg\" alt=\"Avatar\" class=\"avatar\">\n      <strong>John Doe</strong>\n    </div>\n    <h3>Items</h3>\n    <ul class=\"item-list\">\n      <li class=\"item\"><span>First item</span> <small>#1</small></li>\n      <li class=\"item\"><span>Second item</span> <small>#2</small></li>\n    </ul>\n    <div class=\"metadata\" style=\"margin-top: 2rem; font-size: 0.8rem; color: #94a3b8;\">\n      Total: 150 | Page: 1 | Limit: 10\n    </div>\n  </div>\n</body>\n</html>",
+  "durationMs": 127,
+  "timestamp": 1735996800000,
+  "sizeBytes": 2143,
+  "transferSpeed": 16.9,
+  "requestId": "req-abc123-456def-789ghi",
+  "contentType": "text/html",
+  "viewMode": "html"
+}

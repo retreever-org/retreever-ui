@@ -1,0 +1,57 @@
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-type": "application/xml; charset=utf-8",
+    "content-length": "2143",
+    "set-cookie": "session=abc123xyz; Path=/; HttpOnly; Secure; SameSite=Lax",
+    "x-request-id": "req-abc123-456def-789ghi",
+    "x-rate-limit-remaining": "99",
+    "cache-control": "public, max-age=3600",
+    "etag": "W/\"abc123\"",
+    "vary": "Accept-Encoding",
+    "server": "nginx/1.24.0"
+  },
+  "cookies": [
+    {
+      "name": "session",
+      "value": "abc123xyz",
+      "path": "/",
+      "domain": "api.example.com",
+      "expires": "2026-01-10T12:00:00Z",
+      "maxAge": 2592000,
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "theme",
+      "value": "dark",
+      "path": "/",
+      "domain": ".example.com",
+      "maxAge": 86400,
+      "secure": false,
+      "httpOnly": false,
+      "sameSite": "Lax",
+      "local": true
+    },
+    {
+      "name": "_csrf",
+      "value": "xyz789-token-456",
+      "path": "/",
+      "secure": true,
+      "httpOnly": false,
+      "sameSite": "Strict",
+      "local": true
+    }
+  ],
+  "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root>\n  <success>true</success>\n  <data>\n    <userId>123</userId>\n    <email>user@example.com</email>\n    <profile>\n      <name>John Doe</name>\n      <avatar>https://example.com/avatar.jpg</avatar>\n    </profile>\n    <items>\n      <item>\n        <id>1</id>\n        <title>First item</title>\n      </item>\n      <item>\n        <id>2</id>\n        <title>Second item</title>\n      </item>\n    </items>\n    <metadata>\n      <total>150</total>\n      <page>1</page>\n      <limit>10</limit>\n    </metadata>\n  </data>\n  <timestamp>1640995200000</timestamp>\n</root>",
+  "durationMs": 127,
+  "timestamp": 1735996800000,
+  "sizeBytes": 2143,
+  "transferSpeed": 16.9,
+  "requestId": "req-abc123-456def-789ghi",
+  "contentType": "application/xml",
+  "viewMode": "xml"
+}
