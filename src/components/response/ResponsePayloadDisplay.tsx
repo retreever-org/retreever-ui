@@ -4,8 +4,6 @@ import { EditorView } from "@codemirror/view";
 import { json } from "@codemirror/lang-json";
 import { xml } from "@codemirror/lang-xml";
 import { html } from "@codemirror/lang-html";
-import { useViewingTabDoc } from "../../stores/viewing-doc-store";
-import dummyResponse from "../../util/dummyResponse.json";
 import type { ResponseViewMode } from "../../types/editor.types";
 import { monoFont, retreeverDark } from "../canvas/CodeEditor";
 
@@ -53,7 +51,7 @@ const formatPayload = (body: string, viewMode: ResponseViewMode): string => {
         if (trimmed.startsWith("<") && trimmed.includes("</")) {
           const doc = new DOMParser().parseFromString(body, "text/html");
           if (!doc.getElementsByTagName("parsererror").length) {
-            return doc.body.innerHTML;
+            return new XMLSerializer().serializeToString(doc);
           }
         }
         return body;
@@ -70,17 +68,18 @@ const formatPayload = (body: string, viewMode: ResponseViewMode): string => {
 
 interface ResponsePayloadDisplayProps {
   viewMode: ResponseViewMode;
+  content: string | undefined;
 }
 
 const ResponsePayloadDisplay: React.FC<ResponsePayloadDisplayProps> = ({
-  viewMode,
+  viewMode, content
 }) => {
-  const tabDoc = useViewingTabDoc();
-  const rawBody = tabDoc?.lastResponse?.body ?? dummyResponse.body ?? "{}";
+  const rawBody = content ?? "";
   const body = useMemo(
     () => formatPayload(rawBody, viewMode),
     [rawBody, viewMode]
   );
+  console.log(content);
 
   const extensions = useMemo(
     () => [...getExtensions(viewMode), EditorView.lineWrapping, monoFont],

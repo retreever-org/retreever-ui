@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BodyTabContent from "../components/response/BodyTabContent";
 import HeadersTabContent from "../components/response/HeadersTabContent";
 import dummyResponse from "../util/dummyResponse.json"; 
@@ -15,9 +15,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
   
   // Live data from store + dev fallback
   const tabDoc = useViewingTabDoc();
-const lastResponse = tabDoc?.lastResponse 
-  ? tabDoc.lastResponse 
-  : (ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? dummyResponse : null);
+  const lastResponse = tabDoc?.lastResponse ?? (ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? dummyResponse : null);
 
   // Derive metrics with fallbacks
   const status = lastResponse?.status ?? undefined;
@@ -89,7 +87,7 @@ const lastResponse = tabDoc?.lastResponse
       </div>
 
       {/* Tab Content */}
-      {ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? (
+      {lastResponse ? (
         <div className="flex-1 min-h-0 overflow-auto scroll-thin text-sm">
           {activeTab === "body" && <BodyTabContent />}
           {activeTab === "headers" && <HeadersTabContent />}

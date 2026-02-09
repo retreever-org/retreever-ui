@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ResponsePayloadDisplay from "./ResponsePayloadDisplay";
-import dummyResponse from "../../util/dummyResponse.json";
 import { useViewingTabDoc } from "../../stores/viewing-doc-store";
-import { ALLOW_PLACEHOLDER_RESPONSE_RENDERING } from "../../config/env-vars";
+import { ALLOW_PLACEHOLDER_RESPONSE_RENDERING, RESPONSE_CONTENT_TYPE_TESTING } from "../../config/env-vars";
+import { getDummyResponse } from "../../services/dummy-response-registry";
 
 type ViewMode = "json" | "xml" | "html" | "text" | "raw";
 
@@ -15,7 +15,7 @@ const BodyTabContent: React.FC = () => {
   
   const response = tabDoc?.lastResponse 
     ? tabDoc.lastResponse 
-    : (ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? dummyResponse : null);
+    : (ALLOW_PLACEHOLDER_RESPONSE_RENDERING ? getDummyResponse(RESPONSE_CONTENT_TYPE_TESTING) : null);
 
   // Helper to map Content-Type to ViewMode
   const getAutoViewMode = (contentType?: string): ViewMode => {
@@ -112,7 +112,7 @@ const BodyTabContent: React.FC = () => {
           </div>
         ) : (
           <div className="h-full overflow-auto scroll-thin m-2">
-            <ResponsePayloadDisplay viewMode={viewMode} />
+            <ResponsePayloadDisplay viewMode={viewMode} content={response.body} />
           </div>
         )}
       </div>
