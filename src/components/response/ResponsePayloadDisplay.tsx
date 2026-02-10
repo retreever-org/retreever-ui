@@ -79,7 +79,6 @@ const ResponsePayloadDisplay: React.FC<ResponsePayloadDisplayProps> = ({
     () => formatPayload(rawBody, viewMode),
     [rawBody, viewMode]
   );
-  console.log(content);
 
   const extensions = useMemo(
     () => [...getExtensions(viewMode), EditorView.lineWrapping, monoFont],

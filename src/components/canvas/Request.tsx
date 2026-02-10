@@ -19,6 +19,7 @@ const Request: React.FC = () => {
         <input
           type="url"
           value={baseUrl + endpoint?.path}
+          readOnly={true}
           className="py-3 px-2 w-full text-[0.8rem] text-surface-200 font-normal outline-0 focus:outline-2 rounded-md outline-primary-300 focus:outline-primary-300 focus:ring-0 hover:outline-primary-300"
           placeholder="https://api.example.com/your-endpoint"
           spellCheck={false}
