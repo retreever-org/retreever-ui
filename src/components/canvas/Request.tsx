@@ -1,10 +1,23 @@
-import { getBaseURL } from "../../api/axios/axios-instance";
+import { useState } from "react";
+import { runTabRequest } from "../../services/request-executer";
 import { useViewingDocStore } from "../../stores/viewing-doc-store";
 import { getMethodColor } from "./EndpointTabUtil";
 
 const Request: React.FC = () => {
-  const { endpoint } = useViewingDocStore();
-  const baseUrl = getBaseURL();
+  const { endpoint, tabDoc, updateUiRequest } = useViewingDocStore();
+  const [isSending, setIsSending] = useState<boolean>(false);
+
+  const handleSend = async () => {
+    if (!tabDoc || isSending) return;
+
+    try {
+      setIsSending(true);
+      await runTabRequest(tabDoc);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div data-request-bar className="flex justify-center items-center w-full h-12 gap-2">
       <div className="w-full flex items-center border border-surface-500 rounded-md">
@@ -18,8 +31,10 @@ const Request: React.FC = () => {
 
         <input
           type="url"
-          value={baseUrl + endpoint?.path}
-          readOnly={true}
+          value={tabDoc?.uiRequest.url ?? ""}
+          onChange={(e) =>
+            updateUiRequest({ url: e.target.value })
+          }
           className="py-3 px-2 w-full text-[0.8rem] text-surface-200 font-normal outline-0 focus:outline-2 rounded-md outline-primary-300 focus:outline-primary-300 focus:ring-0 hover:outline-primary-300"
           placeholder="https://api.example.com/your-endpoint"
           spellCheck={false}
@@ -29,6 +44,8 @@ const Request: React.FC = () => {
         />
       </div>
       <button
+        onClick={handleSend}
+        disabled={isSending}
         className="
                     h-[92%] w-24 rounded-md text-white font-semibold
                     bg-linear-to-r from-primary-400 to-primary-500 
@@ -37,7 +54,7 @@ const Request: React.FC = () => {
                     transition-all duration-200 transition-none
                     cursor-pointer"
       >
-        Send
+        {isSending ? "Sending..." : "Send"}
       </button>
     </div>
   );

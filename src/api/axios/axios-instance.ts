@@ -19,4 +19,24 @@ export const getBaseURL = (): string => {
 export const apiClient: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
   timeout: 30000,
+  // withCredentials: true, // ensures cookies are included (safe for same-origin; required for cross-origin if ever used)
 });
+
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      return Promise.resolve(error.response);
+    }
+
+    // Network error (no response object)
+    return Promise.resolve({
+      status: 0,
+      statusText: "NETWORK_ERROR",
+      headers: {},
+      data: error.message,
+    });
+  }
+);
+
+

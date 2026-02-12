@@ -54,17 +54,6 @@ export type ResponseViewMode =
   | "raw" // Textual
   | "auto"; // Media: image/video/audio/pdf/csv → preview only
 
-// Media MIME patterns (implicit handling)
-const MEDIA_TYPES = {
-  image: ["image/"],
-  video: ["video/"],
-  audio: ["audio/"],
-  pdf: ["application/pdf"],
-  csv: ["text/csv"],
-  excel: ["application/vnd.", "application/excel"],
-  multipart: ["multipart/"],
-};
-
 export interface TabOrderItem {
   tabKey: string;
   order: number; // 0-based index
@@ -117,4 +106,19 @@ export interface CookieEntry {
   httpOnly: boolean;
   sameSite?: 'Strict' | 'Lax' | 'None';
   local: boolean;   // parsed from response (vs user-added)
+}
+
+export interface RawHttpResponse {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  data: unknown;
+  request?: {
+    responseURL?: string;
+  };
+}
+
+export interface ResponseTiming {
+  durationMs: number;
+  timestamp: number;
 }

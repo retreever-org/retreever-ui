@@ -38,11 +38,6 @@ const StatusTabs: React.FC<StatusTabsProps> = () => {
     return `${(mb / seconds).toFixed(1)} MB/s`;
   };
 
-  const parseCookies = (header: string) => {
-    // Static parsed for demo
-    return staticData.cookies;
-  };
-
   return (
     <div className="space-y-3">
       {/* Status Row */}

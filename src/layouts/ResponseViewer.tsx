@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import BodyTabContent from "../components/response/BodyTabContent";
 import HeadersTabContent from "../components/response/HeadersTabContent";
 import dummyResponse from "../util/dummyResponse.json"; 
 import { useViewingTabDoc } from "../stores/viewing-doc-store";
 import { CookiesTabContent } from "../components/response/CookiesTabContent";
 import { ALLOW_PLACEHOLDER_RESPONSE_RENDERING } from "../config/env-vars";
+import { formatTransferSpeed } from "../services/request-builder-helper";
 
 type TabType = "body" | "headers" | "cookies";
 
@@ -23,7 +24,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
   const durationMs = lastResponse?.durationMs ?? 0;
   const timestamp = lastResponse?.timestamp ?? new Date().getTime();
   const sizeBytes = lastResponse?.sizeBytes ?? 0;
-  const transferSpeed = lastResponse?.transferSpeed ?? 0;
+  const transferSpeed = formatTransferSpeed(lastResponse?.sizeBytes, lastResponse?.durationMs);
 
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -81,7 +82,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = () => {
           {/* Size + Speed */}
           <div className="text-xs text-surface-400 space-x-1">
             <span>{formatBytes(sizeBytes)}</span>
-            <span className="font-mono">↓ {transferSpeed + " MB/s"}</span>
+            <span className="font-mono">↓ {transferSpeed}</span>
           </div>
         </div>
       </div>
