@@ -20,9 +20,36 @@ export async function buildAxiosRequestFromTabDoc(
   let data: any = undefined;
 
   switch (uiRequest.bodyType) {
-    case "raw":
+    case "raw": {
       data = buildRawBody(uiRequest.body.raw, vars);
+
+      const rawType = uiRequest.rawType?.toLowerCase();
+
+      switch (rawType) {
+        case "json":
+          headers["Content-Type"] = "application/json";
+          break;
+
+        case "xml":
+          headers["Content-Type"] = "application/xml";
+          break;
+
+        case "html":
+          headers["Content-Type"] = "text/html";
+          break;
+
+        case "javascript":
+          headers["Content-Type"] = "application/javascript";
+          break;
+
+        case "text":
+        default:
+          headers["Content-Type"] = "text/plain";
+          break;
+      }
+
       break;
+    }
 
     case "x-www-form-urlencoded":
       data = buildUrlEncodedBody(uiRequest.body.urlEncoded, vars);
@@ -36,6 +63,7 @@ export async function buildAxiosRequestFromTabDoc(
 
     case "binary":
       data = await buildBinaryBody(uiRequest.body.binaryFileId);
+      headers["Content-Type"] = "application/octet-stream"
       break;
 
     case "none":

@@ -85,6 +85,15 @@ const ResponsePayloadDisplay: React.FC<ResponsePayloadDisplayProps> = ({
     [viewMode]
   );
 
+  if(!body || body.trim() === "") {
+    return (
+      <div className="h-full w-full space-y-1.5 flex flex-col justify-center items-center">
+          <div className="text-surface-400">No content to display</div>
+          <div className="text-surface-400/80">Response didn't include any payload!</div>
+      </div>
+    );
+  }
+
   return (
     <CodeMirror
       value={body}
